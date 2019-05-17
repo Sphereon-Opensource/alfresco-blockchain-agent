@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.sphereon</groupId>
+    <artifactId>alfresco-blockchain-agent</artifactId>
+    <packaging>jar</packaging>
+    <version>0.0.2-SNAPSHOT</version>
+    <name>alfresco-blockchain-agent</name>
+
+    <prerequisites>
+        <maven>3</maven>
+    </prerequisites>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.0.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>11</java.version>
+        <maven.compiler.source>10</maven.compiler.source>
+        <maven.compiler.target>10</maven.compiler.target>
+
+        <fabric8.generator.from>sphereonregistrydev.azurecr.io/openjdk:10-springboot</fabric8.generator.from>
+        <main.class>com.sphereon.alfresco.blockchain.agent.AlfrescoBlockchainAgentApp</main.class>
+        <http.port>22240</http.port>
+        <health.port>22241</health.port>
+
+        <!-- Docker chainSettings -->
+        <docker.registry.push>sphereonregistrydev.azurecr.io</docker.registry.push> <!-- Create <server> section in .m2/chainSettings.xml with this
+                                                                                registry as id to authenticate to the private registry -->
+        <docker.registry.push.secret-name>sphereonregistrydev</docker.registry.push.secret-name>
+        <docker.registry.pull>docker.io</docker.registry.pull> <!-- Create <server> section in .m2/chainSettings.xml with this
+                                                                                registry as id to authenticate to the private registry -->
+        <docker.image>alfresco-blockchain/${project.artifactId}:%t</docker.image>
+        <docker.port.container.http>${http.port}</docker.port.container.http>
+
+        <!-- Fabric8 Kubernetes Metadata -->
+        <fabric8.namespace>alfresco-blockchain-dev</fabric8.namespace>
+        <fabric8.service.name>${project.artifactId}</fabric8.service.name>
+        <fabric8.label.provider>alfresco</fabric8.label.provider>
+        <fabric8.label.group>com.sphereon.alfresco.blockchain.agent</fabric8.label.group>
+        <fabric8.label.package>alfresco-blockchain-agent</fabric8.label.package>
+        <fabric8.label.container>java</fabric8.label.container>
+        <fabric8.service.type>ClusterIP</fabric8.service.type>
+        <azure.expose-to-vnet>false</azure.expose-to-vnet>
+
+
+        <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
+
+
+        <version.compiler.plugin>3.5.1</version.compiler.plugin>
+        <keycloak.version>2.1.0.Final</keycloak.version>
+        <spring-cloud-dependencies.version>Brixton.SR4</spring-cloud-dependencies.version>
+        <spring-cloud-netflix-dependencies.version>1.1.2.RELEASE</spring-cloud-netflix-dependencies.version>
+
+        <fabric8.version>3.0.12</fabric8.version>
+        <fabric8.maven.plugin.version>3.5.42</fabric8.maven.plugin.version>
+
+        <vaadin.version>8.6.0</vaadin.version>
+        <vaadin.plugin.version>8.6.0</vaadin.plugin.version>
+
+        <!-- If there are no local customizations, this can also be "fetch" or "cdn" -->
+        <vaadin.widgetset.mode>local</vaadin.widgetset.mode>
+
+        <blockchain-proof-sdk-java8.version>0.10.0</blockchain-proof-sdk-java8.version>
+        <easy-blockchain-lib.version>0.1.3</easy-blockchain-lib.version>
+        <crypto-keys-sdk-java8-okhttp-gson.version>0.9.0</crypto-keys-sdk-java8-okhttp-gson.version>
+        <authentication-lib.version>0.1.4-SNAPSHOT</authentication-lib.version>
+        <sphereon-commons-bom.version>1.0.4-SNAPSHOT</sphereon-commons-bom.version>
+        <springfox.version>2.9.2</springfox.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>vaadin-addons</id>
+            <url>http://maven.vaadin.com/vaadin-addons</url>
+        </repository>
+    </repositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-bom</artifactId>
+                <version>${vaadin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.sphereon.ms</groupId>
+                <artifactId>sphereon-ms-commons-bom</artifactId>
+                <version>${sphereon-commons-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>fabric8-project-bom-with-platform-deps</artifactId>
+                <version>${fabric8.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-push</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-client-compiled</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-themes</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin.addon</groupId>
+            <artifactId>locale</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.appreciated</groupId>
+            <artifactId>material</artifactId>
+            <version>1.1.8</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sphereon.public</groupId>
+            <artifactId>authentication-lib-main</artifactId>
+            <version>${authentication-lib.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>25.1-jre</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-smile</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-mrbean</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alfresco.sdk</groupId>
+            <artifactId>alfresco-apis-java8-okhttp-gson</artifactId>
+            <version>1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sphereon.sdk</groupId>
+            <artifactId>blockchain-proof-sdk-java8-okhttp-gson</artifactId>
+            <version>${blockchain-proof-sdk-java8.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sphereon.public</groupId>
+            <artifactId>easy-blockchain-lib-main</artifactId>
+            <version>${easy-blockchain-lib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sphereon.sdk</groupId>
+            <artifactId>crypto-keys-sdk-java8-okhttp-gson</artifactId>
+            <version>${crypto-keys-sdk-java8-okhttp-gson.version}</version>
+        </dependency>
+
+        <!-- Swagger (springfox) dependencies -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${springfox.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-core</artifactId>
+            <version>${springfox.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-bean-validators</artifactId>
+            <version>${springfox.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${springfox.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sphereon.ms</groupId>
+            <artifactId>commons-response</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.11</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-ext</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>fabric8-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-generator</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/webapp</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <executable>true</executable>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-maven-plugin</artifactId>
+                <version>${vaadin.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>update-theme</goal>
+                            <!--<goal>update-widgetset</goal>-->
+                            <goal>compile</goal>
+                            <!-- Comment out compile-theme goal to use on-the-fly theme compilation -->
+                            <goal>compile-theme</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.0.0</version>
+                <!-- Clean up also any pre-compiled themes -->
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>src/main/webapp/VAADIN/themes</directory>
+                            <includes>
+                                <include>**/styles.css</include>
+                                <include>**/styles.scss.cache</include>
+                            </includes>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>fabric8-maven-plugin</artifactId>
+                <version>${fabric8.maven.plugin.version}</version>
+                <configuration>
+                    <mode>kubernetes</mode>
+                    <buildStrategy>docker</buildStrategy>
+                    <buildRecreate>all</buildRecreate>
+                    <autoPull>on</autoPull>
+                    <verbose>true</verbose>
+                    <logStdout>true</logStdout>
+                    <pushRegistry>${docker.registry.push}</pushRegistry>
+                    <pullRegistry>${docker.registry.pull}</pullRegistry>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>build-image</id>
+                        <goals>
+                            <goal>resource</goal>
+                            <goal>build</goal>
+                            <goal>helm</goal>
+                        </goals>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <name>${docker.registry.push}/${docker.image}</name>
+                                    <build>
+                                        <from>${fabric8.generator.from}</from>
+                                        <assembly>
+                                            <basedir>/deployments</basedir>
+                                            <descriptorRef>artifact</descriptorRef>
+                                        </assembly>
+                                        <ports>
+                                            <port>${http.port}</port>
+                                        </ports>
+                                    </build>
+                                </image>
+                            </images>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <profiles>
+        <profile>
+            <id>f8-debug</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <fabric8.debug.enabled>true</fabric8.debug.enabled>
+                <fabric8.debug.port>5005</fabric8.debug.port>
+            </properties>
+        </profile>
+        <!--
+          Default sample commands:
+          mvn -Pf8-build         ... build Docker inputs and getWebservice Kubernetes deployment configs
+          mvn -Pf8-deploy        ... f8-build + push to Docker registry + applying deployment config to the Kubernetes cluster
+          For individual goal usage please consult the fabric8 documentation
+          -->
+        <profile>
+            <id>f8-build</id>
+            <build>
+                <defaultGoal>clean package fabric8:build</defaultGoal>
+            </build>
+        </profile>
+        <profile>
+            <id>f8-deploy</id>
+            <properties>
+                <fabric8.recreate>true</fabric8.recreate>
+            </properties>
+            <build>
+                <defaultGoal>clean package fabric8:build fabric8:push fabric8:apply</defaultGoal>
+            </build>
+        </profile>
+        <profile>
+            <id>kit</id>
+            <activation/>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>2.21.0</version>
+                        <configuration>
+                            <includes>
+                                <include>**/*KT.*</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+
+</project>
