@@ -6,19 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Validator;
 
 public abstract class AsyncCommand<E> extends Command<E> {
-
     private E result;
     private SettableFuture<E> futureResult = SettableFuture.create();
 
     @Autowired
     private Validator validator;
 
-
     public ListenableFuture<E> executeAsync() {
         executeCommandAsync();
         return futureResult;
     }
-
 
     public E executeCommand() {
         try {
@@ -31,11 +28,9 @@ public abstract class AsyncCommand<E> extends Command<E> {
 
     protected abstract void executeCommandAsync();
 
-
     protected void setFuture(ListenableFuture<E> future) {
         futureResult.setFuture(future);
     }
-
 
     public E getResult() {
         if (result == null) {
@@ -53,27 +48,20 @@ public abstract class AsyncCommand<E> extends Command<E> {
         return null;
     }
 
-
     public void setResult(E result) {
         this.result = result;
         futureResult.set(result);
     }
 
-
     public void setException(Throwable throwable) {
         futureResult.setException(throwable);
     }
-
 
     public SettableFuture<E> getFutureResult() {
         return futureResult;
     }
 
-
     public void setFutureResult(SettableFuture<E> futureResult) {
         this.futureResult = futureResult;
     }
-
-
-
 }

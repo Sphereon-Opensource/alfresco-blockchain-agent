@@ -19,22 +19,28 @@ import org.springframework.context.annotation.Configuration;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-public class BlockchainApiConfig {
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BlockchainApiConfig.class);
+public class BlockchainProofApiConfig {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BlockchainProofApiConfig.class);
 
-    @Value("${sphereon.blockchain-proof-api.base-path:https://gw.api.cloud.sphereon.com/blockchain/proof/0.10}")
-    String bcProofBasePath;
+    private String bcProofBasePath;
+    private String cryptoBasePath;
+    private int connectionTimeout;
+    private String applicationName;
 
-    @Value("${sphereon.blockchain-proof-api.base-path:https://gw.api.cloud.sphereon.com/crypto/keys/0.9}")
-    String cryptoBasePath;
-
-    @Value("${sphereon.api-client.timeout:120000}")
-    int connectionTimeout;
+    public BlockchainProofApiConfig(@Value("${sphereon.store.application-name") final String applicationName,
+            @Value("${sphereon.blockchain-proof-api.base-path:https://gw.api.cloud.sphereon.com/blockchain/proof/0.10}") final String bcProofBasePath,
+                                    @Value("${sphereon.blockchain-proof-api.base-path:https://gw.api.cloud.sphereon.com/crypto/keys/0.9}") final String cryptoBasePath,
+                                    @Value("${sphereon.api-client.timeout:120000}") final int connectionTimeout) {
+        this.applicationName = applicationName;
+        this.bcProofBasePath = bcProofBasePath;
+        this.cryptoBasePath = cryptoBasePath;
+        this.connectionTimeout = connectionTimeout;
+    }
 
     @Bean
     AuthenticationApi authenticationApi() {
         ApiConfiguration.Builder configBuilder = new ApiConfiguration.Builder()
-                .withApplication("alfresco-blockchain")
+                .withApplication(applicationName)
                 .withPersistenceType(PersistenceType.SYSTEM_ENVIRONMENT)
                 .withEnvVarPrefix("BLOCKCHAIN");
         return new AuthenticationApi.Builder()

@@ -1,9 +1,13 @@
 package com.sphereon.alfresco.blockchain.agent.backend.commands.controllers;
 
-import com.google.common.util.concurrent.*;
+import com.google.common.util.concurrent.AsyncFunction;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.SettableFuture;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
@@ -15,25 +19,29 @@ import java.util.Stack;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
-/**
- * Created by Sander on 20-3-2017.
- */
 @Component
 @Scope("prototype")
 public class CommandStack {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(CommandStack.class);
 
-    @Autowired
-    private TaskExecutor pooledTaskExecutor;
+    private final TaskExecutor pooledTaskExecutor;
 
-    private Stack<Command<?>> executedCommands = new Stack<>();
+    private Stack<Command<?>> executedCommands;
     // TODO: 24-Nov-17 SPMS-171 Make a stack instead of a single exception
     private Throwable lastException;
-    private SettableFuture<Void> allSuccessfulResult = null;
-    private final Set<ListenableFuture> futureListeners = new HashSet<>();
-    private final Set<ListenableFuture> succeededListeners = new HashSet<>();
-    private final Set<SettableFuture> exceptionListeners = new HashSet<>();
+    private SettableFuture<Void> allSuccessfulResult;
+    private final Set<ListenableFuture> futureListeners;
+    private final Set<ListenableFuture> succeededListeners;
+    private final Set<SettableFuture> exceptionListeners;
 
+    public CommandStack(TaskExecutor pooledTaskExecutor) {
+        this.pooledTaskExecutor = pooledTaskExecutor;
+        executedCommands = new Stack<>();
+        allSuccessfulResult = null;
+        futureListeners = new HashSet<>();
+        succeededListeners = new HashSet<>();
+        exceptionListeners = new HashSet<>();
+    }
 
     public <E> ListenableFuture<E> executeAsync(final Command<E> command) {
         SettableFuture<E> futureResult = SettableFuture.create();
@@ -50,7 +58,6 @@ public class CommandStack {
         return futureResult;
     }
 
-
     private <E> void executeAsyncCommand(Command<E> command, SettableFuture<E> futureResult) {
         ListenableFuture<E> futureCommand = ((AsyncCommand) command).executeAsync();
         Futures.addCallback(futureCommand, new FutureCallback<E>() {
@@ -60,7 +67,6 @@ public class CommandStack {
                 futureResult.set(value);
             }
 
-
             @Override
             public void onFailure(Throwable throwable) {
                 handleExceptionAndUndo(command, futureResult, throwable);
@@ -68,7 +74,6 @@ public class CommandStack {
         }, directExecutor());
         onCommandComplete(futureCommand);
     }
-
 
     public <E> E execute(Command<E> command) throws Throwable {
         checkPreviousException();
@@ -83,7 +88,6 @@ public class CommandStack {
         }
     }
 
-
     public void undo() {
         if (!executedCommands.empty()) {
             final Command command = executedCommands.pop();
@@ -91,14 +95,12 @@ public class CommandStack {
         }
     }
 
-
     public void undo(int stepNr) {
         if (!executedCommands.empty()) {
             final Command command = executedCommands.elementAt(stepNr);
             command.undo();
         }
     }
-
 
     @PreDestroy
     public void reset() {
@@ -109,16 +111,13 @@ public class CommandStack {
         lastException = null;
     }
 
-
     public <I, O> ListenableFuture<O> append(ListenableFuture<I> input, AsyncFunction<? super I, ? extends O> function) {
         return Futures.transformAsync(input, function, MoreExecutors.directExecutor());
     }
 
-
     public <I, O> ListenableFuture<O> append(ListenableFuture<I> input, final Command<O> command) {
         return append(input, command, null);
     }
-
 
     public <I, O> ListenableFuture<O> append(ListenableFuture<I> input, final Command<O> command, FutureSuccess<? super I> inputSuccessCallback) {
         SettableFuture<O> future = SettableFuture.create();
@@ -140,7 +139,6 @@ public class CommandStack {
                 }
             }
 
-
             private void submitAsyncCommand() {
                 try {
                     ListenableFuture<O> result = ((AsyncCommand) command).executeAsync();
@@ -160,7 +158,6 @@ public class CommandStack {
         return future;
     }
 
-
     private <E> void executeInPool(Command<E> command, SettableFuture<E> futureResult) {
         onCommandComplete(futureResult);
         pooledTaskExecutor.execute(() -> {
@@ -172,7 +169,6 @@ public class CommandStack {
         });
     }
 
-
     private <O> void executeInPoolAppend(Command<O> command, SettableFuture<O> future) {
         pooledTaskExecutor.execute(() -> {
             try {
@@ -183,7 +179,6 @@ public class CommandStack {
         });
     }
 
-
     private void onCommandComplete(final ListenableFuture future) {
         futureListeners.add(future);
         Futures.addCallback(future, new FutureCallback<>() {
@@ -193,9 +188,7 @@ public class CommandStack {
                 if (allSuccessfulResult != null && succeededListeners.size() == futureListeners.size()) {
                     allSuccessfulResult.set(null);
                 }
-
             }
-
 
             @Override
             public void onFailure(Throwable throwable) {
@@ -204,14 +197,12 @@ public class CommandStack {
         }, MoreExecutors.directExecutor());
     }
 
-
     private void checkPreviousException() throws Exception {
         if (lastException != null && executedCommands.size() > 0) {
             String lastCommandName = executedCommands.peek().getClass().getName();
             throw new Exception(String.format("A previous commands failed with message '%s', the last executed command was: %s.", lastException.getMessage(), lastCommandName), lastException);
         }
     }
-
 
     private void handleExceptionAndUndo(Command<?> command, SettableFuture<?> futureResult, Throwable throwable) {
         lastException = throwable;
@@ -225,12 +216,10 @@ public class CommandStack {
         undo();
     }
 
-
     public ListenableFuture whenAllSuccessful() {
         allSuccessfulResult = SettableFuture.create();
         return allSuccessfulResult;
     }
-
 
     public void whenAllSuccessful(SettableFuture<?> result) {
         Futures.addCallback(whenAllSuccessful(), new FutureCallback<>() {
@@ -247,11 +236,9 @@ public class CommandStack {
         }, MoreExecutors.directExecutor());
     }
 
-
     public void whenAllSuccessful(FutureCallback<Void> objectFutureCallback) {
         Futures.addCallback(whenAllSuccessful(), objectFutureCallback, MoreExecutors.directExecutor());
     }
-
 
     public void addExceptionListener(SettableFuture<?> future) {
         exceptionListeners.add(future);

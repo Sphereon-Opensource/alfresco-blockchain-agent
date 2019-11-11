@@ -2,7 +2,6 @@ package com.sphereon.alfresco.blockchain.agent.backend.commands.certficate;
 
 import com.sphereon.libs.blockchain.commons.Utils;
 import org.apache.commons.codec.binary.Base64;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -11,28 +10,36 @@ import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Signature;
+import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 @Component
 public class Signer {
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(Signer.class);
-
-    @Value("${BLOCKCHAIN_CERT_PASSWORD:#{null}}")
     private String certificatePassword;
-
-    @Value("${BLOCKCHAIN_CERT_PATH:#{null}}")
     private String certificatePathString;
-
-    @Value("${BLOCKCHAIN_CERT_ALIAS:#{null}}")
     private String certificateAlias;
 
     private KeyPair keyPair;
+
+    public Signer(@Value("${BLOCKCHAIN_CERT_PASSWORD:#{null}}") final String certificatePassword,
+                  @Value("${BLOCKCHAIN_CERT_PATH:#{null}}") final String certificatePathString,
+                  @Value("${BLOCKCHAIN_CERT_ALIAS:#{null}}") final String certificateAlias) {
+        this.certificatePassword = certificatePassword;
+        this.certificatePathString = certificatePathString;
+        this.certificateAlias = certificateAlias;
+    }
 
     @PostConstruct
     public void init() {
@@ -48,31 +55,27 @@ public class Signer {
             final var certificate = (X509Certificate) keystore.getCertificate(certificateAlias);
             final var publicKey = certificate.getPublicKey();
             this.keyPair = new KeyPair(publicKey, privateKey);
-        } catch (Throwable throwable) {
-            throw new RuntimeException("Could not load keystore " + certificatePathString, throwable);
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | IOException | CertificateException exception) {
+            throw new RuntimeException("Could not load keystore " + certificatePathString, exception);
         }
     }
 
     private InputStream getCertificateStream() {
         var certificatePath = Paths.get(certificatePathString);
-        if (Files.exists(certificatePath)) {
-            try {
-                byte[] certificateContent = Files.readAllBytes(certificatePath);
-                boolean isBase64 = false;
-                try {
-                    isBase64 = Base64.isBase64(certificateContent);
-                } catch (Throwable ignored) {
-                }
-                if (isBase64) {
-                    return new ByteArrayInputStream(Base64.decodeBase64(certificateContent));
-                } else {
-                    return new ByteArrayInputStream(certificateContent);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException("Could not open certificate " + certificatePathString, e);
-            }
+
+        if (!Files.exists(certificatePath)) {
+            throw new RuntimeException("Certificate " + certificatePathString + " could not be found.");
         }
-        throw new RuntimeException("Certificate " + certificatePathString + " could not be found.");
+
+        try {
+            byte[] certificateContent = Files.readAllBytes(certificatePath);
+            if (Base64.isBase64(certificateContent)) {
+                return new ByteArrayInputStream(Base64.decodeBase64(certificateContent));
+            }
+            return new ByteArrayInputStream(certificateContent);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Could not open certificate " + certificatePathString, e);
+        }
     }
 
     public String sign(byte[] data) {
@@ -81,9 +84,8 @@ public class Signer {
             signature.initSign(keyPair.getPrivate());
             signature.update(data);
             return Utils.Hex.encodeAsString(signature.sign());
-        } catch (Throwable throwable) {
-            throw new RuntimeException("An error occurred whilst signing the content hash", throwable);
-
+        } catch (SignatureException | InvalidKeyException | NoSuchAlgorithmException exception) {
+            throw new RuntimeException("An error occurred whilst signing the content hash", exception);
         }
     }
 }
