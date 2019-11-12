@@ -16,10 +16,8 @@ import com.alfresco.apis.model.SearchRequest;
 import com.google.common.collect.ImmutableMap;
 import com.sphereon.alfresco.blockchain.agent.backend.AlfrescoBlockchainRegistrationState;
 import com.sphereon.alfresco.blockchain.agent.backend.commands.certficate.Signer;
-import com.sphereon.libs.authentication.api.TokenRequest;
 import com.sphereon.libs.blockchain.commons.Digest;
 import com.sphereon.sdk.blockchain.proof.model.VerifyContentResponse;
-import com.squareup.okhttp.Response;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,13 +33,10 @@ import java.util.Map;
 @Component
 public abstract class AbstractBlockchainTask {
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-    private static final String EXCEPTION_MESSAGE_FETCH_CONTENT = "An error occurred whilst fetching content: "; // TODO: move to constants static class
-
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AbstractBlockchainTask.class);
-    public static final String EXCEPTION_MESSAGE_GET_NODE = "An error occurred whilst getting node %s: %s";
 
-    @Autowired
-    protected TokenRequest tokenRequester;
+    private static final String EXCEPTION_MESSAGE_FETCH_CONTENT = "An error occurred whilst fetching content: ";
+    private static final String EXCEPTION_MESSAGE_GET_NODE = "An error occurred whilst getting node %s: %s";
 
     @Autowired
     private SearchApi alfrescoSearchApi;
@@ -90,8 +85,8 @@ public abstract class AbstractBlockchainTask {
                 String errorMessage = "http status: " + e.getCode() + "\r\n" + e.getResponseBody();
                 throw new RuntimeException(String.format(EXCEPTION_MESSAGE_GET_NODE, nodeId, errorMessage), e);
 
-            } catch (Throwable throwable) {
-                throw new RuntimeException(String.format(EXCEPTION_MESSAGE_GET_NODE, nodeId, throwable.getMessage()), throwable);
+            } catch (Exception exception) {
+                throw new RuntimeException(String.format(EXCEPTION_MESSAGE_GET_NODE, nodeId, exception.getMessage()), exception);
             }
         });
         return nodeEntries;
@@ -102,17 +97,15 @@ public abstract class AbstractBlockchainTask {
         try {
             var call = cmisApiClient.buildCall("/content", "GET", List.of(new Pair("id", nodeId)), null,
                     new HashMap<>(), null, localVarAuthNames, null);
-            Response response = call.execute();
+            var response = call.execute();
             if (response.code() == 200) {
                 return Digest.getInstance().getHashAsHex(Digest.Algorithm.SHA_256, response.body().byteStream()); // TODO: make configurable
-            } else {
-                throw new RuntimeException("Content request returned http code " + response.code());
             }
+            throw new RuntimeException("Content request returned http code " + response.code());
         } catch (ApiException e) {
             throw new RuntimeException(EXCEPTION_MESSAGE_FETCH_CONTENT + e.getCode(), e);
-
-        } catch (Throwable throwable) {
-            throw new RuntimeException(EXCEPTION_MESSAGE_FETCH_CONTENT + throwable.getMessage(), throwable);
+        } catch (Exception exception) {
+            throw new RuntimeException(EXCEPTION_MESSAGE_FETCH_CONTENT + exception.getMessage(), exception);
         }
     }
 
@@ -121,8 +114,8 @@ public abstract class AbstractBlockchainTask {
     }
 
     protected void updateMetadata(String id, VerifyContentResponse.RegistrationStateEnum state, VerifyContentResponse verifyContentResponse) {
-        String now = TIME_FORMATTER.format(ZonedDateTime.now());
-        var properties = ImmutableMap.<String, String>builder()
+        final String now = TIME_FORMATTER.format(ZonedDateTime.now());
+        final var properties = ImmutableMap.<String, String>builder()
                 .put("bc:LastVerificationTime", now);
 
         switch (state) {
@@ -167,10 +160,10 @@ public abstract class AbstractBlockchainTask {
             alfrescoNodesApi.updateNode(id, update, include, null);
 
             logger.info("Node " + id + " updated");
-        } catch (ApiException e) {
-            throw new RuntimeException("An error occurred whilst updating state in node " + id, e);
-        } catch (Exception e) {
-            throw new RuntimeException("An error occurred whilst updating state in node " + id, e);
+        } catch (ApiException exception) {
+            throw new RuntimeException("An error occurred whilst updating state in node " + id, exception);
+        } catch (Exception exception) {
+            throw new RuntimeException("An error occurred whilst updating state in node " + id, exception);
         }
     }
 

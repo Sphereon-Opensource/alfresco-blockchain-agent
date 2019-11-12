@@ -4,11 +4,13 @@ import com.alfresco.apis.handler.ApiException;
 import com.alfresco.apis.model.ResultNode;
 import com.sphereon.alfresco.blockchain.agent.backend.tasks.AbstractBlockchainTask;
 import com.sphereon.alfresco.blockchain.agent.backend.tasks.Task;
+import com.sphereon.libs.authentication.api.TokenRequest;
 import com.sphereon.sdk.blockchain.proof.api.VerificationApi;
 import com.sphereon.sdk.blockchain.proof.model.ContentRequest;
 import com.sphereon.sdk.blockchain.proof.model.VerifyContentResponse;
 import com.sphereon.sdk.blockchain.proof.model.VerifyContentResponse.RegistrationStateEnum;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,9 @@ public class VerifyPendingRegistrationsTask extends AbstractBlockchainTask imple
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(VerifyPendingRegistrationsTask.class);
 
     private final VerificationApi bcProofVerificationApi;
+
+    @Autowired
+    protected TokenRequest tokenRequester;
 
     public VerifyPendingRegistrationsTask(final VerificationApi verificationApi) {
         this.bcProofVerificationApi = verificationApi;

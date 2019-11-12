@@ -4,6 +4,7 @@ import com.alfresco.apis.model.ResultNode;
 import com.google.common.base.Charsets;
 import com.sphereon.alfresco.blockchain.agent.backend.tasks.AbstractBlockchainTask;
 import com.sphereon.alfresco.blockchain.agent.backend.tasks.Task;
+import com.sphereon.libs.authentication.api.TokenRequest;
 import com.sphereon.sdk.blockchain.proof.api.RegistrationApi;
 import com.sphereon.sdk.blockchain.proof.model.ContentRequest;
 import com.sphereon.sdk.blockchain.proof.model.VerifyContentResponse.RegistrationStateEnum;
@@ -21,6 +22,9 @@ public class SignNewDocumentsTask extends AbstractBlockchainTask implements Task
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SignNewDocumentsTask.class);
     public static final String EXCEPTION_MESSAGE_ERROR_REGISTER = "An error occurred whilst registering content: %d\n%s";
+
+    @Autowired
+    protected TokenRequest tokenRequester;
 
     @Autowired
     private RegistrationApi bcProofRegistrationApi;

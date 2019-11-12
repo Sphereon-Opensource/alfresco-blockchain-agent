@@ -3,12 +3,14 @@ package com.sphereon.alfresco.blockchain.agent.backend.tasks.ondemand;
 import com.alfresco.apis.model.Node;
 import com.sphereon.alfresco.blockchain.agent.backend.tasks.AbstractBlockchainTask;
 import com.sphereon.alfresco.blockchain.agent.backend.tasks.Task;
+import com.sphereon.libs.authentication.api.TokenRequest;
 import com.sphereon.sdk.blockchain.proof.api.VerificationApi;
 import com.sphereon.sdk.blockchain.proof.model.ContentRequest;
 import com.sphereon.sdk.blockchain.proof.model.VerifyContentResponse;
 import com.sphereon.sdk.blockchain.proof.model.VerifyContentResponse.RegistrationStateEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -28,6 +30,9 @@ public class VerifyRegistrationsTask extends AbstractBlockchainTask implements T
     private final VerificationApi bcProofVerificationApi;
 
     private List<String> selectedNodeIds;
+
+    @Autowired
+    protected TokenRequest tokenRequester;
 
     public VerifyRegistrationsTask(final VerificationApi bcProofVerificationApi) {
         this.bcProofVerificationApi = bcProofVerificationApi;
