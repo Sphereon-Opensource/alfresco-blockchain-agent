@@ -23,17 +23,14 @@ public class BlockchainProofApiConfig {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BlockchainProofApiConfig.class);
 
     private String bcProofBasePath;
-    private String cryptoBasePath;
     private int connectionTimeout;
     private String applicationName;
 
     public BlockchainProofApiConfig(@Value("${sphereon.store.application-name") final String applicationName,
                                     @Value("${sphereon.blockchain-proof-api.base-path:https://gw.api.cloud.sphereon.com/blockchain/proof/0.10}") final String bcProofBasePath,
-                                    @Value("${sphereon.blockchain-proof-api.base-path:https://gw.api.cloud.sphereon.com/crypto/keys/0.9}") final String cryptoBasePath,
                                     @Value("${sphereon.api-client.timeout:120000}") final int connectionTimeout) {
         this.applicationName = applicationName;
         this.bcProofBasePath = bcProofBasePath;
-        this.cryptoBasePath = cryptoBasePath;
         this.connectionTimeout = connectionTimeout;
     }
 
