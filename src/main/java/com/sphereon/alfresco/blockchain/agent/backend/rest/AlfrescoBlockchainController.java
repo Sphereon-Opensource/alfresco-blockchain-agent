@@ -22,9 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 @RestController(value = "Alfresco blockchain functions")
 @Api(description = "API for blockchain functions using the Alfresco content repository", value = "API for blockchain functions", tags = Constants.Tags.BLOCKCHAIN)
@@ -55,7 +53,7 @@ public class AlfrescoBlockchainController {
         Assert.notNull(verifyNodesRequest, "verifyNodesRequest is null!");
         Assert.notNull(verifyNodesRequest.getNodeIds(), "verifyNodesRequest.nodeIds is null!");
 
-        List<VerifyContentResponse> result = delegateObjectFactory.getObject().verifyEntries(verifyNodesRequest.getNodeIds(), credentials(request));
+        final List<VerifyContentResponse> result = delegateObjectFactory.getObject().verifyEntries(verifyNodesRequest.getNodeIds(), credentials(request));
         if (logger.isDebugEnabled()) {
             logger.exit(result);
         }
@@ -65,13 +63,7 @@ public class AlfrescoBlockchainController {
         return VerifyNodesResponse.wrap(result);
     }
 
-    private String credentials(HttpServletRequest request) {
-        final AtomicReference<String> credentials = new AtomicReference<>();
-        Collections.list(request.getHeaderNames()).forEach(headerName -> {
-            if (HEADER_AUTHORIZATION.equals(headerName)) {
-                credentials.set(request.getHeader(headerName));
-            }
-        });
-        return credentials.get();
+    private String credentials(final HttpServletRequest request) {
+        return request.getHeader(HEADER_AUTHORIZATION);
     }
 }

@@ -4,7 +4,6 @@ import com.alfresco.apis.model.Node;
 import com.google.common.base.Charsets;
 import com.sphereon.alfresco.blockchain.agent.backend.commands.certficate.Signer;
 import com.sphereon.alfresco.blockchain.agent.backend.tasks.BlockchainTask;
-import com.sphereon.alfresco.blockchain.agent.backend.tasks.Task;
 import com.sphereon.alfresco.blockchain.agent.sphereon.proof.ProofApiUtils;
 import com.sphereon.libs.authentication.api.TokenRequest;
 import com.sphereon.sdk.blockchain.proof.api.VerificationApi;
@@ -28,7 +27,7 @@ import static com.sphereon.alfresco.blockchain.agent.backend.AlfrescoBlockchainR
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class VerifyRegistrationsTask implements Task<List<VerifyContentResponse>> {
+public class VerifyRegistrationsTask {
     private static final Logger logger = LoggerFactory.getLogger(VerifyRegistrationsTask.class);
 
     private final VerificationApi bcProofVerificationApi;
@@ -37,8 +36,6 @@ public class VerifyRegistrationsTask implements Task<List<VerifyContentResponse>
     private final BlockchainTask blockchainTask;
     private final Signer signer;
     private final String proofApiConfigName;
-
-    private List<String> selectedNodeIds;
 
     public VerifyRegistrationsTask(final VerificationApi bcProofVerificationApi,
                                    final TokenRequest tokenRequester,
@@ -54,7 +51,15 @@ public class VerifyRegistrationsTask implements Task<List<VerifyContentResponse>
         this.proofApiConfigName = proofApiConfigName;
     }
 
-    public List<VerifyContentResponse> execute() {
+    public void updateCredentials(String credentials) {
+        final var base64Decoded = new String(Base64.decodeBase64(credentials), Charsets.UTF_8);
+        final var tokenizer = new StringTokenizer(base64Decoded, ":", false);
+        final var userName = tokenizer.nextToken();
+        final var password = tokenizer.nextToken();
+        this.blockchainTask.updateCredentials(userName, password);
+    }
+
+    public List<VerifyContentResponse> execute(final List<String> selectedNodeIds) {
         final List<VerifyContentResponse> contentResponses = new ArrayList<>();
         try {
             this.blockchainTask.selectEntries(selectedNodeIds).forEach(nodeEntry -> {
@@ -101,17 +106,5 @@ public class VerifyRegistrationsTask implements Task<List<VerifyContentResponse>
         } catch (Throwable throwable) {
             throw new RuntimeException("An error occurred whilst verifying content: " + throwable.getMessage(), throwable);
         }
-    }
-
-    public void setSelectedNodeIds(List<String> selectedNodeIds) {
-        this.selectedNodeIds = selectedNodeIds;
-    }
-
-    public void updateCredentials(String credentials) {
-        final var base64Decoded = new String(Base64.decodeBase64(credentials), Charsets.UTF_8);
-        final var tokenizer = new StringTokenizer(base64Decoded, ":", false);
-        final var userName = tokenizer.nextToken();
-        final var password = tokenizer.nextToken();
-        this.blockchainTask.updateCredentials(userName, password);
     }
 }

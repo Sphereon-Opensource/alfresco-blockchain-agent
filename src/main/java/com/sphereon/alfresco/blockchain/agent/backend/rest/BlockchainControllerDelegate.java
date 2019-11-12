@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component("oneshotDelegate")
+@Component
 public class BlockchainControllerDelegate {
     private final VerifyRegistrationsTask verifyRegistrationsTask;
 
@@ -19,7 +19,6 @@ public class BlockchainControllerDelegate {
         if (StringUtils.isNotEmpty(credentials)) {
             verifyRegistrationsTask.updateCredentials(credentials);
         }
-        verifyRegistrationsTask.setSelectedNodeIds(nodeIds);
-        return verifyRegistrationsTask.execute();
+        return verifyRegistrationsTask.execute(nodeIds);
     }
 }
