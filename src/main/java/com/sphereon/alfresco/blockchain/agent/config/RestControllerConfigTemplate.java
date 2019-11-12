@@ -86,11 +86,11 @@ public class RestControllerConfigTemplate {
     }
 
     @Bean
-    Map<Mode, Docket> dockets(SimplifiedDocketConfigurator docketConfigurator,
-                              @Qualifier("sphereonDocketConfigMap") SphereonDocketConfigMap sphereonDocketConfigMap,
-                              SecurityScheme securitySchema,
-                              SecurityContext securityContext,
-                              TypeResolver typeResolver) {
+    Map<Mode, Docket> dockets(final SimplifiedDocketConfigurator docketConfigurator,
+                              @Qualifier("sphereonDocketConfigMap") final SphereonDocketConfigMap sphereonDocketConfigMap,
+                              final SecurityScheme securitySchema,
+                              final SecurityContext securityContext,
+                              final TypeResolver typeResolver) {
         Map<Mode, Docket> docketMap = new HashMap<>();
         for (Mode mode : Mode.values()) {
             SphereonDocketConfig sphereonDocketConfig = sphereonDocketConfigMap.get(mode);
@@ -131,8 +131,8 @@ public class RestControllerConfigTemplate {
     }
 
     @Bean
-    SecurityContext securityContext(@Qualifier("sphereonDocketConfigMap") SphereonDocketConfigMap sphereonDocketConfigMap,
-                                    List<SecurityReference> defaultAuth) {
+    SecurityContext securityContext(@Qualifier("sphereonDocketConfigMap") final SphereonDocketConfigMap sphereonDocketConfigMap,
+                                    final List<SecurityReference> defaultAuth) {
         return SecurityContext.builder()
                 .securityReferences(defaultAuth)
                 .forPaths(s -> {
@@ -170,7 +170,7 @@ public class RestControllerConfigTemplate {
     }
 
     @Bean
-    OAuth securitySchema(@Qualifier("sphereonDocketConfigMap") SphereonDocketConfigMap sphereonDocketConfigMap) {
+    OAuth securitySchema(@Qualifier("sphereonDocketConfigMap") final SphereonDocketConfigMap sphereonDocketConfigMap) {
         SphereonDocketConfig sphereonDocketConfig = sphereonDocketConfigMap.get(Mode.DEFAULT);
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
         LoginEndpoint loginEndpoint = new LoginEndpoint("https://" + sphereonDocketConfig.getGatewayHostName() + "/token");
@@ -209,7 +209,7 @@ public class RestControllerConfigTemplate {
     }
 
     @Bean
-    MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter(@Qualifier("primaryObjectMapper") ObjectMapper objectMapper) {
+    MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter(@Qualifier("primaryObjectMapper") final ObjectMapper objectMapper) {
         MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
         jsonConverter.setObjectMapper(objectMapper);
         List<MediaType> mediaTypes = new ArrayList<>();
@@ -238,7 +238,7 @@ public class RestControllerConfigTemplate {
     }
 
     @Bean
-    RestTemplate restTemplate(@Qualifier("mappingJackson2HttpMessageConverter") MappingJackson2HttpMessageConverter httpMessageConverter) {
+    RestTemplate restTemplate(@Qualifier("mappingJackson2HttpMessageConverter") final MappingJackson2HttpMessageConverter httpMessageConverter) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(httpMessageConverter);
         return restTemplate;
@@ -353,7 +353,7 @@ public class RestControllerConfigTemplate {
     }
 
     @Bean
-    SphereonDocketConfigMap sphereonDocketConfigMap(SimplifiedDocketConfigurator docketConfigurator) {
+    SphereonDocketConfigMap sphereonDocketConfigMap(final SimplifiedDocketConfigurator docketConfigurator) {
         SphereonDocketConfigMap map = new SphereonDocketConfigMap();
         for (Mode mode : Mode.values()) {
             SimplifiedDocketConfigurator.Builder docketBuilder = new SimplifiedDocketConfigurator.Builder();
@@ -363,7 +363,7 @@ public class RestControllerConfigTemplate {
         return map;
     }
 
-    private ApiInfo getApiInfo(SimplifiedDocketConfigurator docketConfigurator, Mode mode) {
+    private ApiInfo getApiInfo(final SimplifiedDocketConfigurator docketConfigurator, final Mode mode) {
         ApiInfoBuilder apiInfoBuilder = new ApiInfoBuilder();
         docketConfigurator.configureApiInfo(apiInfoBuilder, mode);
         return apiInfoBuilder.build();

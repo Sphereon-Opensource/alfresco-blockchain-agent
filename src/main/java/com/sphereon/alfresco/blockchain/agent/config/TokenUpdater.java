@@ -12,16 +12,16 @@ public class TokenUpdater {
     private String currentAccessToken;
     private Set<UpdateEvent> updateEvents;
 
-    public TokenUpdater(AuthenticationApi storeElevatedAuthenticationApi) {
+    public TokenUpdater(final AuthenticationApi storeElevatedAuthenticationApi) {
         this.storeElevatedAuthenticationApi = storeElevatedAuthenticationApi;
         this.updateEvents = new HashSet<>();
     }
 
-    public void addUpdateListener(UpdateEvent updateEvent) {
+    public void addUpdateListener(final UpdateEvent updateEvent) {
         updateEvents.add(updateEvent);
     }
 
-    public void updateAccessToken(String accessToken) {
+    public void updateAccessToken(final String accessToken) {
         this.currentAccessToken = accessToken;
         for (var event : updateEvents) {
             event.setAccessToken(accessToken);

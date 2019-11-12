@@ -26,21 +26,27 @@ class AlfrescoApisConfig {
     private static final String SEARCH_API_PATH = "/alfresco/api/-default-/public/search/versions/1";
     private static final String CMIS_API_PATH = "/alfresco/api/-default-/public/cmis/versions/1.1/atom";
 
-    private final ApiClient authenticationApiClient = new ApiClient();
-    private final ApiClient coreApiClient = new ApiClient();
-    private final ApiClient searchApiClient = new ApiClient();
+    private final ApiClient authenticationApiClient;
+    private final ApiClient coreApiClient;
+    private final ApiClient searchApiClient;
 
-    @Value("${alfresco.api-client.timeout:40000}")
     private int connectionTimeout;
-
-    @Value("${alfresco.dns-name}")
     private String alfrescoDnsName;
+    private String userName;
+    private String password;
 
-    @Value("${alfresco-username}")
-    private String userName; // from system env
-
-    @Value("${alfresco-password}")
-    private String password;// from system env
+    AlfrescoApisConfig(@Value("${alfresco.api-client.timeout:40000}") final int connectionTimeout,
+                       @Value("${alfresco.dns-name}") final String alfrescoDnsName,
+                       @Value("${alfresco-username}") final String userName,
+                       @Value("${alfresco-password}") final String password) {
+        this.connectionTimeout = connectionTimeout;
+        this.alfrescoDnsName = alfrescoDnsName;
+        this.userName = userName; // from system env
+        this.password = password; // from system env
+        this.authenticationApiClient = new ApiClient();
+        this.coreApiClient = new ApiClient();
+        this.searchApiClient = new ApiClient();
+    }
 
     @PostConstruct
     void init() {

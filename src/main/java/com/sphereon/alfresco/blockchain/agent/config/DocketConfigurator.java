@@ -19,13 +19,12 @@ public class DocketConfigurator implements SimplifiedDocketConfigurator {
 
     @Override
     public void configureDocket(Builder docketBuilder, Mode mode) {
-        docketBuilder.withPathMapping(Mode.DEFAULT, "/alfresco-blockchain/")
+        docketBuilder
+                .withPathMapping(Mode.DEFAULT, "/alfresco-blockchain/")
                 .withPathSelector("^/(alfresco-blockchain.*)")
                 .withGatewayHostname(dnsName + "/agent")
-                .withTags(Constants.TagEnum.ALFRESCO_BLOCKCHAIN_SERVICE.asTag()
-                );
+                .withTags(Constants.TagEnum.ALFRESCO_BLOCKCHAIN_SERVICE.asTag());
     }
-
 
     @Override
     public void configureApiInfo(ApiInfoBuilder apiInfoBuilder, Mode mode) {
@@ -37,11 +36,10 @@ public class DocketConfigurator implements SimplifiedDocketConfigurator {
                 .version(apiVersion);
     }
 
-
     private String description(Mode mode) {
-        String desc = "This is an API containing functions for blockchain integration with Alfresco.\r\n";
+        final String desc = "This is an API containing functions for blockchain integration with Alfresco.\r\n";
         if (mode == Mode.DEFAULT) {
-            desc = desc.replaceAll("<[^>]+>", "");
+            return desc.replaceAll("<[^>]+>", "");
         }
         return desc;
     }
