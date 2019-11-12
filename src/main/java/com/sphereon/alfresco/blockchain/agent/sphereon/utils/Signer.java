@@ -1,4 +1,4 @@
-package com.sphereon.alfresco.blockchain.agent.backend.commands.certficate;
+package com.sphereon.alfresco.blockchain.agent.sphereon.utils;
 
 import com.sphereon.libs.blockchain.commons.Utils;
 import org.apache.commons.codec.binary.Base64;

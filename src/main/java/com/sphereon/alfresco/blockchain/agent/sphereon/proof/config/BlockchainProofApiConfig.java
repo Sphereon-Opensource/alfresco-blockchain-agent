@@ -1,4 +1,4 @@
-package com.sphereon.alfresco.blockchain.agent.config;
+package com.sphereon.alfresco.blockchain.agent.sphereon.proof.config;
 
 import com.sphereon.libs.authentication.api.AuthenticationApi;
 import com.sphereon.libs.authentication.api.TokenRequest;

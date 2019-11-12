@@ -2,7 +2,7 @@ package com.sphereon.alfresco.blockchain.agent.backend.tasks.ondemand;
 
 import com.alfresco.apis.model.Node;
 import com.google.common.base.Charsets;
-import com.sphereon.alfresco.blockchain.agent.backend.commands.certficate.Signer;
+import com.sphereon.alfresco.blockchain.agent.sphereon.utils.Signer;
 import com.sphereon.alfresco.blockchain.agent.backend.tasks.BlockchainTask;
 import com.sphereon.alfresco.blockchain.agent.sphereon.proof.ProofApiUtils;
 import com.sphereon.libs.authentication.api.TokenRequest;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import static com.sphereon.alfresco.blockchain.agent.backend.AlfrescoBlockchainRegistrationState.PENDING_REGISTRATION;
+import static com.sphereon.alfresco.blockchain.agent.sphereon.alfresco.AlfrescoBlockchainRegistrationState.PENDING_REGISTRATION;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)

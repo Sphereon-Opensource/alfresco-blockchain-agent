@@ -1,7 +1,7 @@
 package com.sphereon.alfresco.blockchain.agent.backend.tasks.scheduled;
 
 import com.google.common.base.Charsets;
-import com.sphereon.alfresco.blockchain.agent.backend.commands.certficate.Signer;
+import com.sphereon.alfresco.blockchain.agent.sphereon.utils.Signer;
 import com.sphereon.alfresco.blockchain.agent.backend.tasks.BlockchainTask;
 import com.sphereon.alfresco.blockchain.agent.backend.tasks.Task;
 import com.sphereon.alfresco.blockchain.agent.sphereon.proof.ProofApiUtils;
@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import static com.sphereon.alfresco.blockchain.agent.backend.AlfrescoBlockchainRegistrationState.PENDING_REGISTRATION;
+import static com.sphereon.alfresco.blockchain.agent.sphereon.alfresco.AlfrescoBlockchainRegistrationState.PENDING_REGISTRATION;
 
 @Component
 public class SignNewDocumentsTask implements Task<Void> {

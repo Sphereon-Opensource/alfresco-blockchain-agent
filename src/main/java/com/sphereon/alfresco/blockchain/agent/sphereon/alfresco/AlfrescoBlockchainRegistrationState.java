@@ -1,4 +1,4 @@
-package com.sphereon.alfresco.blockchain.agent.backend;
+package com.sphereon.alfresco.blockchain.agent.sphereon.alfresco;
 
 public enum AlfrescoBlockchainRegistrationState {
     REGISTERED("REGISTERED"),

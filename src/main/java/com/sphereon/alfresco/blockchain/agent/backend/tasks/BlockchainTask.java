@@ -14,7 +14,7 @@ import com.alfresco.apis.model.ResultSetPaging;
 import com.alfresco.apis.model.ResultSetRowEntry;
 import com.alfresco.apis.model.SearchRequest;
 import com.google.common.collect.ImmutableMap;
-import com.sphereon.alfresco.blockchain.agent.backend.AlfrescoBlockchainRegistrationState;
+import com.sphereon.alfresco.blockchain.agent.sphereon.alfresco.AlfrescoBlockchainRegistrationState;
 import com.sphereon.libs.blockchain.commons.Digest;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

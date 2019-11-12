@@ -1,6 +1,6 @@
 package com.sphereon.alfresco.blockchain.agent.sphereon.proof;
 
-import com.sphereon.alfresco.blockchain.agent.backend.AlfrescoBlockchainRegistrationState;
+import com.sphereon.alfresco.blockchain.agent.sphereon.alfresco.AlfrescoBlockchainRegistrationState;
 import com.sphereon.sdk.blockchain.proof.model.VerifyContentResponse;
 import org.junit.Test;
 
