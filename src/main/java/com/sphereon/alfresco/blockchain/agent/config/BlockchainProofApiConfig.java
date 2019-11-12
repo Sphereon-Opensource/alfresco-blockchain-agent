@@ -28,7 +28,7 @@ public class BlockchainProofApiConfig {
     private String applicationName;
 
     public BlockchainProofApiConfig(@Value("${sphereon.store.application-name") final String applicationName,
-            @Value("${sphereon.blockchain-proof-api.base-path:https://gw.api.cloud.sphereon.com/blockchain/proof/0.10}") final String bcProofBasePath,
+                                    @Value("${sphereon.blockchain-proof-api.base-path:https://gw.api.cloud.sphereon.com/blockchain/proof/0.10}") final String bcProofBasePath,
                                     @Value("${sphereon.blockchain-proof-api.base-path:https://gw.api.cloud.sphereon.com/crypto/keys/0.9}") final String cryptoBasePath,
                                     @Value("${sphereon.api-client.timeout:120000}") final int connectionTimeout) {
         this.applicationName = applicationName;
@@ -56,56 +56,26 @@ public class BlockchainProofApiConfig {
 
     @Bean
     public VerificationApi bcProofVerificationApi(@Qualifier("tokenRequester") TokenRequest tokenRequester) {
-        VerificationApi api = new VerificationApi();
-        final ApiClient apiClient = api.getApiClient();
-        apiClient.setBasePath(bcProofBasePath);
-        apiClient.setConnectTimeout(connectionTimeout);
-        apiClient.getHttpClient().setWriteTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
-        apiClient.getHttpClient().setReadTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
-        apiClient.setAccessToken(tokenRequester.execute().getAccessToken());
-        tokenRequester.addTokenResponseListener(new TokenRequest.TokenResponseListener() {
-            @Override
-            public void tokenResponse(TokenResponse tokenResponse) {
-                apiClient.setAccessToken(tokenResponse.getAccessToken());
-            }
-
-
-            @Override
-            public void exception(Throwable throwable) {
-                logger.error("An error occurred whilst renewing token for the blockchain verification API", throwable);
-            }
-        });
+        final VerificationApi api = new VerificationApi();
+        configureApiClient(tokenRequester, api.getApiClient());
         return api;
     }
 
     @Bean
     public RegistrationApi bcProofRegistrationApi(@Qualifier("tokenRequester") TokenRequest tokenRequester) {
-        RegistrationApi api = new RegistrationApi();
-        final ApiClient apiClient = api.getApiClient();
-        apiClient.setBasePath(bcProofBasePath);
-        apiClient.setConnectTimeout(connectionTimeout);
-        apiClient.getHttpClient().setWriteTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
-        apiClient.getHttpClient().setReadTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
-        apiClient.setAccessToken(tokenRequester.execute().getAccessToken());
-        tokenRequester.addTokenResponseListener(new TokenRequest.TokenResponseListener() {
-            @Override
-            public void tokenResponse(TokenResponse tokenResponse) {
-                apiClient.setAccessToken(tokenResponse.getAccessToken());
-            }
-
-
-            @Override
-            public void exception(Throwable throwable) {
-                logger.error("An error occurred whilst renewing token for the blockchain verification API", throwable);
-            }
-        });
+        final RegistrationApi api = new RegistrationApi();
+        configureApiClient(tokenRequester, api.getApiClient());
         return api;
     }
 
     @Bean
     public ConfigurationApi configurationApi(@Qualifier("tokenRequester") TokenRequest tokenRequester) {
-        ConfigurationApi api = new ConfigurationApi();
-        final ApiClient apiClient = api.getApiClient();
+        final ConfigurationApi api = new ConfigurationApi();
+        configureApiClient(tokenRequester, api.getApiClient());
+        return api;
+    }
+
+    private void configureApiClient(final TokenRequest tokenRequester, final ApiClient apiClient) {
         apiClient.setBasePath(bcProofBasePath);
         apiClient.setConnectTimeout(connectionTimeout);
         apiClient.getHttpClient().setWriteTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
@@ -122,6 +92,5 @@ public class BlockchainProofApiConfig {
                 logger.error("An error occurred whilst renewing token for the blockchain verification API", throwable);
             }
         });
-        return api;
     }
 }
