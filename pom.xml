@@ -61,14 +61,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <groupId>com.sphereon.public</groupId>
+            <artifactId>authentication-lib-main</artifactId>
+            <version>${authentication-lib.version}</version>
         </dependency>
 
         <dependency>
@@ -78,10 +73,41 @@
             <scope>provided</scope>
         </dependency>
 
+        <!--http://nexus.qa.sphereon.com/repository/bif/-->
         <dependency>
-            <groupId>com.sphereon.public</groupId>
-            <artifactId>authentication-lib-main</artifactId>
-            <version>${authentication-lib.version}</version>
+            <groupId>org.blockchain-innovation.factom.client</groupId>
+            <artifactId>factom-client-impl</artifactId>
+            <version>0.2.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.blockchain-innovation.factom.client</groupId>
+            <artifactId>logger-slf4j</artifactId>
+            <version>0.2.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.blockchain-innovation.factom.client</groupId>
+            <artifactId>json-converter-gson</artifactId>
+            <version>0.2.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.blockchain-innovation.factom.client</groupId>
+            <artifactId>spring-boot-support</artifactId>
+            <version>0.2.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.blockchain-innovation.factom.client</groupId>
+            <artifactId>factom-client-api</artifactId>
+            <version>0.2.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
         <dependency>
@@ -161,6 +187,7 @@
             <artifactId>springfox-swagger-ui</artifactId>
             <version>${springfox.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.sphereon.ms</groupId>
             <artifactId>commons-response</artifactId>
@@ -174,6 +201,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-ext</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
