@@ -1,15 +1,18 @@
 package com.sphereon.alfresco.blockchain.agent.backend.rest;
 
+import com.sphereon.alfresco.blockchain.agent.backend.rest.model.VerifyNodesRequest;
 import com.sphereon.alfresco.blockchain.agent.backend.rest.model.VerifyNodesResponse;
 import com.sphereon.sdk.blockchain.proof.model.ErrorResponse;
 import com.sphereon.sdk.blockchain.proof.model.VerifyContentResponse;
-import com.sphereon.alfresco.blockchain.agent.backend.rest.model.VerifyNodesRequest;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.slf4j.MDC;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
@@ -26,20 +29,21 @@ import java.util.concurrent.atomic.AtomicReference;
 @RestController(value = "Alfresco blockchain functions")
 @Api(description = "API for blockchain functions using the Alfresco content repository", value = "API for blockchain functions", tags = Constants.Tags.BLOCKCHAIN)
 public class AlfrescoBlockchainController {
+    private static final String HEADER_AUTHORIZATION = "Authorization";
 
     private static final XLogger logger = XLoggerFactory.getXLogger(AlfrescoBlockchainController.class);
 
-    private static final String HEADER_AUTHORIZATION = "Authorization";
+    private final ObjectFactory<BlockchainControllerDelegate> delegateObjectFactory;
 
-    @Autowired
-    private ObjectFactory<BlockchainControllerDelegate> delegateObjectFactory;
-
+    public AlfrescoBlockchainController(ObjectFactory<BlockchainControllerDelegate> delegateObjectFactory) {
+        this.delegateObjectFactory = delegateObjectFactory;
+    }
 
     @ApiOperation(nickname = Constants.VerifyEntries.OPERATION_ID, value = Constants.VerifyEntries.SHORT_DESCRIPTION, notes = Constants.VerifyEntries.LONG_DESCRIPTION)
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Node entries successfully proc."),
-        @ApiResponse(code = 400, message = "Verification request failed", response = ErrorResponse.class),
-        @ApiResponse(code = 404, message = "One or more node id's could not be found", response = ErrorResponse.class)
+            @ApiResponse(code = 200, message = "Node entries successfully proc."),
+            @ApiResponse(code = 400, message = "Verification request failed", response = ErrorResponse.class),
+            @ApiResponse(code = 404, message = "One or more node id's could not be found", response = ErrorResponse.class)
     })
     @ResponseStatus(code = HttpStatus.OK) // Needed to override the default 200 code
     @PostMapping(value = Constants.Endpoints.AlfrescoBlockchain.VERIFY_ENTRIES, consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
@@ -60,7 +64,6 @@ public class AlfrescoBlockchainController {
         // TODO: throw RestExceptions with documented http codes
         return VerifyNodesResponse.wrap(result);
     }
-
 
     private String credentials(HttpServletRequest request) {
         final AtomicReference<String> credentials = new AtomicReference<>();

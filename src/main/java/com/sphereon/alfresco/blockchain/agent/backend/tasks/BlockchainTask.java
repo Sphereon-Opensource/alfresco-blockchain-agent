@@ -15,14 +15,14 @@ import com.alfresco.apis.model.ResultSetRowEntry;
 import com.alfresco.apis.model.SearchRequest;
 import com.google.common.collect.ImmutableMap;
 import com.sphereon.alfresco.blockchain.agent.backend.AlfrescoBlockchainRegistrationState;
-import com.sphereon.alfresco.blockchain.agent.backend.commands.certficate.Signer;
 import com.sphereon.libs.blockchain.commons.Digest;
-import com.sphereon.sdk.blockchain.proof.model.VerifyContentResponse;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -31,37 +31,36 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public abstract class AbstractBlockchainTask {
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class BlockchainTask {
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AbstractBlockchainTask.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BlockchainTask.class);
 
     private static final String EXCEPTION_MESSAGE_FETCH_CONTENT = "An error occurred whilst fetching content: ";
     private static final String EXCEPTION_MESSAGE_GET_NODE = "An error occurred whilst getting node %s: %s";
 
-    @Autowired
-    private SearchApi alfrescoSearchApi;
+    private final SearchApi alfrescoSearchApi;
+    private final ApiClient cmisApiClient;
+    private final NodesApi alfrescoNodesApi;
 
-    @Autowired
-    private ApiClient cmisApiClient;
-
-    @Autowired
-    private NodesApi alfrescoNodesApi;
-
-    @Autowired
-    protected Signer signer;
-
-    @Value("${blockchain.config-name:#{null}}")
-    protected String configName;
-
-    @Value("${alfresco.query.model}")
     private String model;
-
-    @Value("${alfresco.query.registration-state:RegistrationState}")
     private String registrationStateProperty;
 
-    protected List<ResultSetRowEntry> selectEntries(final AlfrescoBlockchainRegistrationState state) throws ApiException {
-        SearchRequest request = new SearchRequest();
-        RequestQuery query = new RequestQuery();
+    public BlockchainTask(final SearchApi alfrescoSearchApi,
+                          final ApiClient cmisApiClient,
+                          final NodesApi alfrescoNodesApi,
+                          @Value("${alfresco.query.model}") final String model,
+                          @Value("${alfresco.query.registration-state:RegistrationState}") final String registrationStateProperty) {
+        this.alfrescoSearchApi = alfrescoSearchApi;
+        this.cmisApiClient = cmisApiClient;
+        this.alfrescoNodesApi = alfrescoNodesApi;
+        this.model = model;
+        this.registrationStateProperty = registrationStateProperty;
+    }
+
+    public List<ResultSetRowEntry> selectEntries(final AlfrescoBlockchainRegistrationState state) throws ApiException {
+        final SearchRequest request = new SearchRequest();
+        final RequestQuery query = new RequestQuery();
         query.setLanguage(RequestQuery.LanguageEnum.AFTS);
         query.setQuery('{' + model + '}' + registrationStateProperty + ':' + state.getKey());
         request.setQuery(query);
@@ -69,11 +68,11 @@ public abstract class AbstractBlockchainTask {
         include.add("properties");
         request.include(include);
 
-        ResultSetPaging pagedResult = alfrescoSearchApi.search(request);
+        final ResultSetPaging pagedResult = alfrescoSearchApi.search(request);
         return pagedResult.getList().getEntries();
     }
 
-    protected List<NodeEntry> selectEntries(final List<String> nodeIds) {
+    public List<NodeEntry> selectEntries(final List<String> nodeIds) {
         final List<NodeEntry> nodeEntries = new ArrayList<>();
         final List<String> include = new ArrayList<>();
         include.add("properties");
@@ -84,7 +83,6 @@ public abstract class AbstractBlockchainTask {
             } catch (ApiException e) {
                 String errorMessage = "http status: " + e.getCode() + "\r\n" + e.getResponseBody();
                 throw new RuntimeException(String.format(EXCEPTION_MESSAGE_GET_NODE, nodeId, errorMessage), e);
-
             } catch (Exception exception) {
                 throw new RuntimeException(String.format(EXCEPTION_MESSAGE_GET_NODE, nodeId, exception.getMessage()), exception);
             }
@@ -92,7 +90,7 @@ public abstract class AbstractBlockchainTask {
         return nodeEntries;
     }
 
-    protected byte[] hashEntry(String nodeId) {
+    public byte[] hashEntry(final String nodeId) {
         final String[] localVarAuthNames = new String[]{"basicAuth"};
         try {
             var call = cmisApiClient.buildCall("/content", "GET", List.of(new Pair("id", nodeId)), null,
@@ -109,44 +107,38 @@ public abstract class AbstractBlockchainTask {
         }
     }
 
-    protected void updateMetadata(String id, VerifyContentResponse.RegistrationStateEnum state) {
-        updateMetadata(id, state, null);
+    public void updateAlfrescoNodeWith(String id, AlfrescoBlockchainRegistrationState state) {
+        updateAlfrescoNodeWith(id, state, null, null, null);
     }
 
-    protected void updateMetadata(String id, VerifyContentResponse.RegistrationStateEnum state, VerifyContentResponse verifyContentResponse) {
+    public void updateAlfrescoNodeWith(final String id,
+                                       final AlfrescoBlockchainRegistrationState state,
+                                       final OffsetDateTime registrationTime,
+                                       final String singleProofChainChainId,
+                                       final String perHashProofChainChainId) {
         final String now = TIME_FORMATTER.format(ZonedDateTime.now());
         final var properties = ImmutableMap.<String, String>builder()
-                .put("bc:LastVerificationTime", now);
+                .put("bc:LastVerificationTime", now)
+                .put("bc:RegistrationState", state.getKey());
 
-        switch (state) {
-            case NOT_REGISTERED:
-                properties.put("bc:RegistrationState", AlfrescoBlockchainRegistrationState.NOT_REGISTERED.getKey());
-                break;
-            case PENDING:
-                properties.put("bc:RegistrationState", AlfrescoBlockchainRegistrationState.PENDING_VERIFICATION.getKey());
-                break;
-            case REGISTERED:
-                properties.put("bc:RegistrationState", AlfrescoBlockchainRegistrationState.REGISTERED.getKey());
-                if (verifyContentResponse != null) {
-                    if (verifyContentResponse.getRegistrationTime() != null) {
-                        properties.put("bc:RegistrationTime", TIME_FORMATTER.format(verifyContentResponse.getRegistrationTime()));
-                    }
-                    if (verifyContentResponse.getPerHashProofChain() != null) {
-                        properties.put("bc:ExternalLinks", createLink(verifyContentResponse.getPerHashProofChain().getChainId()));
-                    } else if (verifyContentResponse.getSingleProofChain() != null) {
-                        properties.put("bc:ExternalLinks", createLink(verifyContentResponse.getSingleProofChain().getChainId()));
-                    }
-                }
-                break;
+        if (state == AlfrescoBlockchainRegistrationState.REGISTERED) {
+            if (registrationTime != null) {
+                properties.put("bc:RegistrationTime", TIME_FORMATTER.format(registrationTime));
+            }
+            if (singleProofChainChainId != null) {
+                properties.put("bc:ExternalLinks", explorerLinkFrom(singleProofChainChainId));
+            } else if (perHashProofChainChainId != null) {
+                properties.put("bc:ExternalLinks", explorerLinkFrom(perHashProofChainChainId));
+            }
         }
-        updateNode(id, properties.build());
+        updateAlfrescoNodeWith(id, properties.build());
     }
 
-    private String createLink(String chainId) {
+    private String explorerLinkFrom(final String chainId) {
         return "https://explorer.factoid.org/data?type=chain&key=" + chainId;
     }
 
-    private void updateNode(String id, Map<String, String> map) {
+    private void updateAlfrescoNodeWith(final String id, final Map<String, String> map) {
         try {
             NodeBodyUpdate update = new NodeBodyUpdate();
             update.setProperties(map);
@@ -167,12 +159,15 @@ public abstract class AbstractBlockchainTask {
         }
     }
 
-    public void updateCredentials(String userName, String password) {
-        HttpBasicAuth authentication = (HttpBasicAuth) alfrescoSearchApi.getApiClient().getAuthentication("basicAuth");
-        authentication.setUsername(userName);
-        authentication.setPassword(password);
-        authentication = (HttpBasicAuth) cmisApiClient.getAuthentication("basicAuth");
-        authentication.setUsername(userName);
-        authentication.setPassword(password);
+    public void updateCredentials(final String userName, final String password) {
+        final HttpBasicAuth alfrescoSearchAuthentication = (HttpBasicAuth) alfrescoSearchApi
+                .getApiClient()
+                .getAuthentication("basicAuth");
+        alfrescoSearchAuthentication.setUsername(userName);
+        alfrescoSearchAuthentication.setPassword(password);
+
+        final HttpBasicAuth alfrescoCmisAuthentication = (HttpBasicAuth) cmisApiClient.getAuthentication("basicAuth");
+        alfrescoCmisAuthentication.setUsername(userName);
+        alfrescoCmisAuthentication.setPassword(password);
     }
 }
