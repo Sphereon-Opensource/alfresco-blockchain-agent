@@ -1,4 +1,4 @@
-package com.sphereon.alfresco.blockchain.agent.proof;
+package com.sphereon.alfresco.blockchain.agent.proof.tasks;
 
 import com.google.common.base.Charsets;
 import com.sphereon.alfresco.blockchain.agent.tasks.scheduled.SignNewDocumentsTask;
@@ -31,6 +31,7 @@ public class ProofSignNewDocumentTask implements SignNewDocumentsTask {
         this.proofApiConfigName = proofApiConfigName;
     }
 
+    @Override
     public void registerEntry(byte[] contentHash) {
         tokenRequester.execute();
         var contentRequest = new ContentRequest();

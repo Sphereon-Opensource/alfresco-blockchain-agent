@@ -22,7 +22,7 @@ import static com.sphereon.sdk.blockchain.proof.model.CreateConfigurationRequest
  * Task that verifies that the Blockchain Proof config is valid. Annotated with {@code @ApplicationListener} to run as startup-time check.
  */
 @Component
-public class CheckBlockchainProofConfigTask implements ApplicationListener<ApplicationReadyEvent> {
+public class BlockchainProofConfigVerifier implements ApplicationListener<ApplicationReadyEvent> {
     private static final String EXCEPTION_MESSAGE_GET_CONFIG = "An error occurred whilst retrieving blockchain configuration %s: %s";
     private static final String ASSERT_MESSAGE_GET_CONFIG = "An error occurred whilst retrieving blockchain configuration %s. The response was empty.";
     private static final String EXCEPTION_MESSAGE_CREATE_CONFIG = "An error occurred whilst creating blockchain configuration %s: %s";
@@ -32,9 +32,9 @@ public class CheckBlockchainProofConfigTask implements ApplicationListener<Appli
     private final String configName;
     private final String context;
 
-    public CheckBlockchainProofConfigTask(final ConfigurationApi configurationApi,
-                                          @Value("${blockchain.config-name:#{null}}") final String configName,
-                                          @Value("${blockchain.context:factom}") final String context) {
+    public BlockchainProofConfigVerifier(final ConfigurationApi configurationApi,
+                                         @Value("${blockchain.config-name:#{null}}") final String configName,
+                                         @Value("${blockchain.context:factom}") final String context) {
         this.configurationApi = configurationApi;
         this.configName = configName;
         this.context = context;

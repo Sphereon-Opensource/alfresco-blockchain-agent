@@ -32,19 +32,9 @@ public class ProofVerificationTask implements VerifyRegistrationTask {
         this.proofApiConfigName = proofApiConfigName;
     }
 
+    @Override
     public VerifyContentAlfrescoResponse verify(final byte[] contentHash) {
-        return toAlfrescoResponse(verifyHash(contentHash));
-    }
-
-    private VerifyContentAlfrescoResponse toAlfrescoResponse(final VerifyContentResponse verifyResponse) {
-        final var response = new VerifyContentAlfrescoResponse();
-        response.setRequestId(verifyResponse.getRequestId());
-        response.setBase64Signature(verifyResponse.getBase64Signature());
-        response.setHash(verifyResponse.getHash());
-        response.setHexSignature(verifyResponse.getHexSignature());
-        response.setRegistrationTime(verifyResponse.getRegistrationTime());
-        response.setRegistrationState(utils.alfrescoRegistrationStateFrom(verifyResponse.getRegistrationState()));
-        return response;
+        return this.utils.toAlfrescoResponse(verifyHash(contentHash));
     }
 
     private VerifyContentResponse verifyHash(final byte[] contentHash) {
