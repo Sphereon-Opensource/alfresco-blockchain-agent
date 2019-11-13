@@ -1,6 +1,7 @@
 package com.sphereon.alfresco.blockchain.agent.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -8,6 +9,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.time.OffsetDateTime;
 
 @XmlRootElement
 @ApiModel(description = "Verify Content response")
@@ -31,6 +33,26 @@ public class VerifyContentAlfrescoResponse {
     @ApiModelProperty(notes = "The calculated signature in base64 form", required = true, readOnly = true)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String base64Signature;
+
+    @XmlElement
+    @ApiModelProperty
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private OffsetDateTime registrationTime;
+
+    @XmlElement
+    @ApiModelProperty
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String perHashProofChainId;
+
+    @XmlElement
+    @ApiModelProperty
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String singleProofChainId;
+
+    @XmlElement
+    @ApiModelProperty
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private AlfrescoBlockchainRegistrationState registrationState;
 
     public String getHash() {
         return hash;
@@ -62,5 +84,37 @@ public class VerifyContentAlfrescoResponse {
 
     public void setRequestId(String requestId) {
         this.requestId = requestId;
+    }
+
+    public OffsetDateTime getRegistrationTime() {
+        return registrationTime;
+    }
+
+    public void setRegistrationTime(OffsetDateTime registrationTime) {
+        this.registrationTime = registrationTime;
+    }
+
+    public String getPerHashProofChainId() {
+        return perHashProofChainId;
+    }
+
+    public void setPerHashProofChainId(String perHashProofChainId) {
+        this.perHashProofChainId = perHashProofChainId;
+    }
+
+    public String getSingleProofChainId() {
+        return singleProofChainId;
+    }
+
+    public void setSingleProofChainId(String singleProofChainId) {
+        this.singleProofChainId = singleProofChainId;
+    }
+
+    public AlfrescoBlockchainRegistrationState getRegistrationState() {
+        return registrationState;
+    }
+
+    public void setRegistrationState(AlfrescoBlockchainRegistrationState registrationState) {
+        this.registrationState = registrationState;
     }
 }
