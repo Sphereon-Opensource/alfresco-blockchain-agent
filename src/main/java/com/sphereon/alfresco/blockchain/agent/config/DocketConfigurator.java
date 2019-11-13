@@ -11,14 +11,17 @@ import static com.sphereon.alfresco.blockchain.agent.config.RestControllerConfig
 
 @Configuration
 public class DocketConfigurator implements SimplifiedDocketConfigurator {
-    @Value(value = "${alfresco-blockchain.api.version}")
-    private String apiVersion;
+    private final String apiVersion;
+    private final String dnsName;
 
-    @Value(value = "${alfresco.dns-name}")
-    private String dnsName;
+    public DocketConfigurator(@Value(value = "${alfresco-blockchain.api.version}") final String apiVersion,
+                              @Value(value = "${alfresco.dns-name}") final String dnsName) {
+        this.apiVersion = apiVersion;
+        this.dnsName = dnsName;
+    }
 
     @Override
-    public void configureDocket(Builder docketBuilder, Mode mode) {
+    public void configureDocket(final Builder docketBuilder, final Mode mode) {
         docketBuilder
                 .withPathMapping(Mode.DEFAULT, "/alfresco-blockchain/")
                 .withPathSelector("^/(alfresco-blockchain.*)")
@@ -27,7 +30,7 @@ public class DocketConfigurator implements SimplifiedDocketConfigurator {
     }
 
     @Override
-    public void configureApiInfo(ApiInfoBuilder apiInfoBuilder, Mode mode) {
+    public void configureApiInfo(final ApiInfoBuilder apiInfoBuilder, final Mode mode) {
         apiInfoBuilder.title("Alfresco Blockchain Agent for Alfresco API's")
                 .description(description(mode))
                 .contact(new Contact("Sphereon DevOps Team", "https://sphereon.com", "dev@sphereon.com"))
@@ -36,7 +39,7 @@ public class DocketConfigurator implements SimplifiedDocketConfigurator {
                 .version(apiVersion);
     }
 
-    private String description(Mode mode) {
+    private String description(final Mode mode) {
         final String desc = "This is an API containing functions for blockchain integration with Alfresco.\r\n";
         if (mode == Mode.DEFAULT) {
             return desc.replaceAll("<[^>]+>", "");

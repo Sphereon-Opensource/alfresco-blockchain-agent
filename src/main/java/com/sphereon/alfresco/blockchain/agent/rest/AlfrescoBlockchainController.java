@@ -4,6 +4,7 @@ import com.sphereon.alfresco.blockchain.agent.rest.model.ErrorResponse;
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyNodesRequest;
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyNodesResponse;
+import com.sphereon.alfresco.blockchain.agent.tasks.ondemand.VerifyRegistrations;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -12,7 +13,6 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.MDC;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
@@ -31,10 +31,10 @@ public class AlfrescoBlockchainController {
 
     private static final XLogger logger = XLoggerFactory.getXLogger(AlfrescoBlockchainController.class);
 
-    private final ObjectFactory<BlockchainControllerDelegate> delegateObjectFactory;
+    private final VerifyRegistrations verifyRegistrations;
 
-    public AlfrescoBlockchainController(ObjectFactory<BlockchainControllerDelegate> delegateObjectFactory) {
-        this.delegateObjectFactory = delegateObjectFactory;
+    public AlfrescoBlockchainController(final VerifyRegistrations verifyRegistrations) {
+        this.verifyRegistrations = verifyRegistrations;
     }
 
     @ApiOperation(nickname = Constants.VerifyEntries.OPERATION_ID, value = Constants.VerifyEntries.SHORT_DESCRIPTION, notes = Constants.VerifyEntries.LONG_DESCRIPTION)
@@ -45,15 +45,15 @@ public class AlfrescoBlockchainController {
     })
     @ResponseStatus(code = HttpStatus.OK) // Needed to override the default 200 code
     @PostMapping(value = Constants.Endpoints.AlfrescoBlockchain.VERIFY_ENTRIES, consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
-    public VerifyNodesResponse verifyEntries(
-            @ApiParam(required = true, name = Constants.Param.NODE_IDS) @RequestBody VerifyNodesRequest verifyNodesRequest, HttpServletRequest request) {
+    public VerifyNodesResponse verifyEntries(@ApiParam(required = true, name = Constants.Param.NODE_IDS) @RequestBody final VerifyNodesRequest verifyNodesRequest,
+                                             final HttpServletRequest request) {
         if (logger.isDebugEnabled()) {
             logger.entry(verifyNodesRequest);
         }
         Assert.notNull(verifyNodesRequest, "verifyNodesRequest is null!");
         Assert.notNull(verifyNodesRequest.getNodeIds(), "verifyNodesRequest.nodeIds is null!");
 
-        final List<VerifyContentAlfrescoResponse> result = this.delegateObjectFactory.getObject().verifyEntries(verifyNodesRequest.getNodeIds(), credentials(request));
+        final List<VerifyContentAlfrescoResponse> result = verifyRegistrations.execute(verifyNodesRequest.getNodeIds(), credentials(request));
         if (logger.isDebugEnabled()) {
             logger.exit(result);
         }

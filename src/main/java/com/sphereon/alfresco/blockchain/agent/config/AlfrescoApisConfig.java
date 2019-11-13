@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 class AlfrescoApisConfig {
-    private static final String AUTHENTICTAION_API_PATH = "/alfresco/api/-default-/public/authentication/versions/1";
+    private static final String AUTHENTICATION_API_PATH = "/alfresco/api/-default-/public/authentication/versions/1";
     private static final String CORE_API_PATH = "/alfresco/api/-default-/public/alfresco/versions/1";
     private static final String SEARCH_API_PATH = "/alfresco/api/-default-/public/search/versions/1";
     private static final String CMIS_API_PATH = "/alfresco/api/-default-/public/cmis/versions/1.1/atom";
@@ -30,27 +30,27 @@ class AlfrescoApisConfig {
     private final ApiClient coreApiClient;
     private final ApiClient searchApiClient;
 
-    private int connectionTimeout;
-    private String alfrescoDnsName;
-    private String userName;
-    private String password;
+    private final int connectionTimeout;
+    private final String alfrescoDnsName;
+    private final String userName;
+    private final String password;
 
     AlfrescoApisConfig(@Value("${alfresco.api-client.timeout:40000}") final int connectionTimeout,
                        @Value("${alfresco.dns-name}") final String alfrescoDnsName,
                        @Value("${alfresco-username}") final String userName,
                        @Value("${alfresco-password}") final String password) {
+        this.authenticationApiClient = new ApiClient();
+        this.coreApiClient = new ApiClient();
+        this.searchApiClient = new ApiClient();
         this.connectionTimeout = connectionTimeout;
         this.alfrescoDnsName = alfrescoDnsName;
         this.userName = userName; // from system env
         this.password = password; // from system env
-        this.authenticationApiClient = new ApiClient();
-        this.coreApiClient = new ApiClient();
-        this.searchApiClient = new ApiClient();
     }
 
     @PostConstruct
     void init() {
-        configureClient(authenticationApiClient, AUTHENTICTAION_API_PATH);
+        configureClient(authenticationApiClient, AUTHENTICATION_API_PATH);
         configureClient(coreApiClient, CORE_API_PATH);
         configureClient(searchApiClient, SEARCH_API_PATH);
     }
@@ -100,20 +100,28 @@ class AlfrescoApisConfig {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     ApiClient cmisApiClient() {
-        ApiClient cmisApiClient = new ApiClient();
+        final var cmisApiClient = new ApiClient();
         configureClient(cmisApiClient, CMIS_API_PATH);
         return cmisApiClient;
     }
 
-    private void configureClient(ApiClient apiClient, String apiPath) {
-        HttpBasicAuth authentication = (HttpBasicAuth) apiClient.getAuthentication("basicAuth");
-        authentication.setUsername(userName);
-        authentication.setPassword(password);
+    private void configureClient(final ApiClient apiClient, final String apiPath) {
+        configureClientAuthentication(apiClient);
         apiClient.setBasePath("https://" + alfrescoDnsName + apiPath);
+        configureClientTimeouts(apiClient);
+    }
+
+    private void configureClientTimeouts(final ApiClient apiClient) {
         apiClient.setConnectTimeout(connectionTimeout);
-        OkHttpClient httpClient = apiClient.getHttpClient();
+        final OkHttpClient httpClient = apiClient.getHttpClient();
         httpClient.setConnectTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
         httpClient.setReadTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
         httpClient.setWriteTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
+    }
+
+    private void configureClientAuthentication(final ApiClient apiClient) {
+        final var authentication = (HttpBasicAuth) apiClient.getAuthentication("basicAuth");
+        authentication.setUsername(userName);
+        authentication.setPassword(password);
     }
 }

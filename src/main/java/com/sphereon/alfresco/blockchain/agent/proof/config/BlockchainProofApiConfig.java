@@ -5,6 +5,7 @@ import com.sphereon.libs.authentication.api.TokenRequest;
 import com.sphereon.libs.authentication.api.TokenResponse;
 import com.sphereon.libs.authentication.api.config.ApiConfiguration;
 import com.sphereon.libs.authentication.api.config.PersistenceType;
+import com.sphereon.ms.rest.response.RequestHeaderAccess;
 import com.sphereon.sdk.blockchain.proof.api.ConfigurationApi;
 import com.sphereon.sdk.blockchain.proof.api.RegistrationApi;
 import com.sphereon.sdk.blockchain.proof.api.VerificationApi;
@@ -32,6 +33,11 @@ public class BlockchainProofApiConfig {
         this.applicationName = applicationName;
         this.bcProofBasePath = bcProofBasePath;
         this.connectionTimeout = connectionTimeout;
+    }
+
+    @Bean
+    public RequestHeaderAccess requestHeaderAccess() {
+        return new RequestHeaderAccess();
     }
 
     @Bean

@@ -32,9 +32,9 @@ import java.util.Map;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class BlockchainTask {
+public class AlfrescoRepository {
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BlockchainTask.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AlfrescoRepository.class);
 
     private static final String EXCEPTION_MESSAGE_FETCH_CONTENT = "An error occurred whilst fetching content: ";
     private static final String EXCEPTION_MESSAGE_GET_NODE = "An error occurred whilst getting node %s: %s";
@@ -46,11 +46,11 @@ public class BlockchainTask {
     private String model;
     private String registrationStateProperty;
 
-    public BlockchainTask(final SearchApi alfrescoSearchApi,
-                          final ApiClient cmisApiClient,
-                          final NodesApi alfrescoNodesApi,
-                          @Value("${alfresco.query.model}") final String model,
-                          @Value("${alfresco.query.registration-state:RegistrationState}") final String registrationStateProperty) {
+    public AlfrescoRepository(final SearchApi alfrescoSearchApi,
+                              final ApiClient cmisApiClient,
+                              final NodesApi alfrescoNodesApi,
+                              @Value("${alfresco.query.model}") final String model,
+                              @Value("${alfresco.query.registration-state:RegistrationState}") final String registrationStateProperty) {
         this.alfrescoSearchApi = alfrescoSearchApi;
         this.cmisApiClient = cmisApiClient;
         this.alfrescoNodesApi = alfrescoNodesApi;
@@ -72,12 +72,12 @@ public class BlockchainTask {
         return pagedResult.getList().getEntries();
     }
 
-    public List<NodeEntry> selectEntries(final List<String> nodeIds) {
+    public List<NodeEntry> selectEntries(final List<String> alfrescoNodeIds) {
         final List<NodeEntry> nodeEntries = new ArrayList<>();
         final List<String> include = new ArrayList<>();
         include.add("properties");
 
-        nodeIds.forEach(nodeId -> {
+        alfrescoNodeIds.forEach(nodeId -> {
             try {
                 nodeEntries.add(alfrescoNodesApi.getNode(nodeId, include, null, null));
             } catch (ApiException e) {
@@ -90,10 +90,10 @@ public class BlockchainTask {
         return nodeEntries;
     }
 
-    public byte[] hashEntry(final String nodeId) {
+    public byte[] hashEntry(final String alfrescoNodeId) {
         final String[] localVarAuthNames = new String[]{"basicAuth"};
         try {
-            var call = cmisApiClient.buildCall("/content", "GET", List.of(new Pair("id", nodeId)), null,
+            var call = cmisApiClient.buildCall("/content", "GET", List.of(new Pair("id", alfrescoNodeId)), null,
                     new HashMap<>(), null, localVarAuthNames, null);
             var response = call.execute();
             if (response.code() == 200) {
@@ -111,19 +111,19 @@ public class BlockchainTask {
         updateAlfrescoNodeWith(id, state, null, null, null);
     }
 
-    public void updateAlfrescoNodeWith(final String id,
-                                       final AlfrescoBlockchainRegistrationState state,
-                                       final OffsetDateTime registrationTime,
+    public void updateAlfrescoNodeWith(final String alfrescoNodeId,
+                                       final AlfrescoBlockchainRegistrationState blockchainRegistrationState,
+                                       final OffsetDateTime blockchainRegistrationTime,
                                        final String singleProofChainChainId,
                                        final String perHashProofChainChainId) {
         final String now = TIME_FORMATTER.format(ZonedDateTime.now());
         final var properties = ImmutableMap.<String, String>builder()
                 .put("bc:LastVerificationTime", now)
-                .put("bc:RegistrationState", state.getKey());
+                .put("bc:RegistrationState", blockchainRegistrationState.getKey());
 
-        if (state == AlfrescoBlockchainRegistrationState.REGISTERED) {
-            if (registrationTime != null) {
-                properties.put("bc:RegistrationTime", TIME_FORMATTER.format(registrationTime));
+        if (blockchainRegistrationState == AlfrescoBlockchainRegistrationState.REGISTERED) {
+            if (blockchainRegistrationTime != null) {
+                properties.put("bc:RegistrationTime", TIME_FORMATTER.format(blockchainRegistrationTime));
             }
             if (singleProofChainChainId != null) {
                 properties.put("bc:ExternalLinks", explorerLinkFrom(singleProofChainChainId));
@@ -131,31 +131,28 @@ public class BlockchainTask {
                 properties.put("bc:ExternalLinks", explorerLinkFrom(perHashProofChainChainId));
             }
         }
-        updateAlfrescoNodeWith(id, properties.build());
+        updateAlfrescoNodeWith(alfrescoNodeId, properties.build());
     }
 
     private String explorerLinkFrom(final String chainId) {
         return "https://explorer.factoid.org/data?type=chain&key=" + chainId;
     }
 
-    private void updateAlfrescoNodeWith(final String id, final Map<String, String> map) {
+    private void updateAlfrescoNodeWith(final String alfrescoNodeId, final Map<String, String> properties) {
         try {
             NodeBodyUpdate update = new NodeBodyUpdate();
-            update.setProperties(map);
+            update.setProperties(properties);
             RequestInclude include = new RequestInclude();
             include.add("properties");
-            logger.info("Updating node " + id);
-            map.forEach((key, value2) -> {
-                        logger.info("  - " + key + '=' + value2);
-                    }
-            );
-            alfrescoNodesApi.updateNode(id, update, include, null);
+            logger.info("Updating node " + alfrescoNodeId);
+            properties.forEach((key, value2) -> logger.info("  - " + key + '=' + value2));
+            alfrescoNodesApi.updateNode(alfrescoNodeId, update, include, null);
 
-            logger.info("Node " + id + " updated");
+            logger.info("Node " + alfrescoNodeId + " updated");
         } catch (ApiException exception) {
-            throw new RuntimeException("An error occurred whilst updating state in node " + id, exception);
+            throw new RuntimeException("An error occurred whilst updating state in node " + alfrescoNodeId, exception);
         } catch (Exception exception) {
-            throw new RuntimeException("An error occurred whilst updating state in node " + id, exception);
+            throw new RuntimeException("An error occurred whilst updating state in node " + alfrescoNodeId, exception);
         }
     }
 

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
-import com.sphereon.ms.rest.response.RequestHeaderAccess;
 import org.apache.catalina.filters.RequestDumperFilter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -91,7 +90,7 @@ public class RestControllerConfigTemplate {
                               final SecurityScheme securitySchema,
                               final SecurityContext securityContext,
                               final TypeResolver typeResolver) {
-        Map<Mode, Docket> docketMap = new HashMap<>();
+        final Map<Mode, Docket> docketMap = new HashMap<>();
         for (Mode mode : Mode.values()) {
             SphereonDocketConfig sphereonDocketConfig = sphereonDocketConfigMap.get(mode);
             ApiInfo apiInfo = getApiInfo(docketConfigurator, mode);
@@ -152,38 +151,32 @@ public class RestControllerConfigTemplate {
 
     @Bean
     FilterRegistrationBean corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
+        final var source = new UrlBasedCorsConfigurationSource();
+        final var config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+        final var bean = new FilterRegistrationBean(new CorsFilter(source));
         bean.setOrder(0);
         return bean;
     }
 
     @Bean
-    public RequestHeaderAccess requestHeaderAccess() {
-        return new RequestHeaderAccess();
-    }
-
-    @Bean
     OAuth securitySchema(@Qualifier("sphereonDocketConfigMap") final SphereonDocketConfigMap sphereonDocketConfigMap) {
-        SphereonDocketConfig sphereonDocketConfig = sphereonDocketConfigMap.get(Mode.DEFAULT);
-        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
-        LoginEndpoint loginEndpoint = new LoginEndpoint("https://" + sphereonDocketConfig.getGatewayHostName() + "/token");
-        GrantType ownerGrantType = new ResourceOwnerPasswordCredentialsGrant(loginEndpoint.getUrl());
-        GrantType clientGrantType = new ClientCredentialsGrant(loginEndpoint.getUrl());
+        final var sphereonDocketConfig = sphereonDocketConfigMap.get(Mode.DEFAULT);
+        final var authorizationScope = new AuthorizationScope("global", "accessEverything");
+        final var loginEndpoint = new LoginEndpoint("https://" + sphereonDocketConfig.getGatewayHostName() + "/token");
+        final GrantType ownerGrantType = new ResourceOwnerPasswordCredentialsGrant(loginEndpoint.getUrl());
+        final GrantType clientGrantType = new ClientCredentialsGrant(loginEndpoint.getUrl());
         return new OAuth("oauth2schema", newArrayList(authorizationScope), newArrayList(ownerGrantType, clientGrantType));
     }
 
     @Bean
     List<SecurityReference> defaultAuth() {
-        AuthorizationScope authorizationScope
-                = new AuthorizationScope("global", "accessEverything");
-        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
+        final var authorizationScope = new AuthorizationScope("global", "accessEverything");
+        final var authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
         return newArrayList(new SecurityReference("oauth2schema", authorizationScopes));
     }
@@ -296,19 +289,24 @@ public class RestControllerConfigTemplate {
     }
 
     private static class SphereonDocketConfig {
-
         @Value("${sphereon.api.gateway-address:gw.api.cloud.sphereon.com}")
         private String gatewayHostName;
 
-        private final Map<Mode, String> pathMappings = new HashMap<>();
+        private final Map<Mode, String> pathMappings;
 
-        private final Set<Tag> additionalTags = Sets.newHashSet();
+        private final Set<Tag> additionalTags;
 
         private Tag firstTag;
 
-        private Predicate<RequestHandler> apiSelector = RequestHandlerSelectors.any();
+        private Predicate<RequestHandler> apiSelector;
 
         private Predicate<String> pathSelector;
+
+        private SphereonDocketConfig() {
+            pathMappings = new HashMap<>();
+            additionalTags = Sets.newHashSet();
+            apiSelector = RequestHandlerSelectors.any();
+        }
 
         public String getGatewayHostName() {
             return gatewayHostName;
@@ -349,14 +347,13 @@ public class RestControllerConfigTemplate {
         Tag[] getAdditionalTags() {
             return additionalTags.toArray(new Tag[additionalTags.size()]);
         }
-
     }
 
     @Bean
     SphereonDocketConfigMap sphereonDocketConfigMap(final SimplifiedDocketConfigurator docketConfigurator) {
-        SphereonDocketConfigMap map = new SphereonDocketConfigMap();
-        for (Mode mode : Mode.values()) {
-            SimplifiedDocketConfigurator.Builder docketBuilder = new SimplifiedDocketConfigurator.Builder();
+        final var map = new SphereonDocketConfigMap();
+        for (final Mode mode : Mode.values()) {
+            final var docketBuilder = new SimplifiedDocketConfigurator.Builder();
             docketConfigurator.configureDocket(docketBuilder, mode);
             map.put(mode, docketBuilder.build());
         }
@@ -364,7 +361,7 @@ public class RestControllerConfigTemplate {
     }
 
     private ApiInfo getApiInfo(final SimplifiedDocketConfigurator docketConfigurator, final Mode mode) {
-        ApiInfoBuilder apiInfoBuilder = new ApiInfoBuilder();
+        final var apiInfoBuilder = new ApiInfoBuilder();
         docketConfigurator.configureApiInfo(apiInfoBuilder, mode);
         return apiInfoBuilder.build();
     }
@@ -383,8 +380,12 @@ public class RestControllerConfigTemplate {
         };
     }
 
-    public class SphereonDocketConfigMap {
-        private Map<Mode, SphereonDocketConfig> map = new HashMap<>();
+    public static class SphereonDocketConfigMap {
+        private final Map<Mode, SphereonDocketConfig> map;
+
+        public SphereonDocketConfigMap() {
+            this.map = new HashMap<>();
+        }
 
         public SphereonDocketConfig get(Mode mode) {
             return map.get(mode);

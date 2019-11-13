@@ -27,9 +27,9 @@ import java.security.cert.X509Certificate;
 
 @Component
 public class Signer {
-    private String certificatePassword;
-    private String certificatePathString;
-    private String certificateAlias;
+    private final String certificatePassword;
+    private final String certificatePathString;
+    private final String certificateAlias;
 
     private KeyPair keyPair;
 
@@ -47,10 +47,11 @@ public class Signer {
         Assert.notNull(certificatePassword, "The environment variable BLOCKCHAIN_CERT_PASSWORD is not set.");
 
         try {
-            KeyStore keystore = KeyStore.getInstance("PKCS12");
-            char[] password = certificatePassword.toCharArray();
-            InputStream certificateStream = getCertificateStream();
+            final var keystore = KeyStore.getInstance("PKCS12");
+            final char[] password = certificatePassword.toCharArray();
+            final InputStream certificateStream = getCertificateStream();
             keystore.load(certificateStream, password);
+
             final var privateKey = (PrivateKey) keystore.getKey(certificateAlias, password);
             final var certificate = (X509Certificate) keystore.getCertificate(certificateAlias);
             final var publicKey = certificate.getPublicKey();
@@ -61,14 +62,14 @@ public class Signer {
     }
 
     private InputStream getCertificateStream() {
-        var certificatePath = Paths.get(certificatePathString);
+        final var certificatePath = Paths.get(certificatePathString);
 
         if (!Files.exists(certificatePath)) {
             throw new RuntimeException("Certificate " + certificatePathString + " could not be found.");
         }
 
         try {
-            byte[] certificateContent = Files.readAllBytes(certificatePath);
+            final byte[] certificateContent = Files.readAllBytes(certificatePath);
             if (Base64.isBase64(certificateContent)) {
                 return new ByteArrayInputStream(Base64.decodeBase64(certificateContent));
             }
@@ -78,7 +79,7 @@ public class Signer {
         }
     }
 
-    public String sign(byte[] data) {
+    public String sign(final byte[] data) {
         try {
             final var signature = Signature.getInstance("SHA512withRSA");
             signature.initSign(keyPair.getPrivate());
