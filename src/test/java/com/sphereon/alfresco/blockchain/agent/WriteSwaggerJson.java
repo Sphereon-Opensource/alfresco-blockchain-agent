@@ -1,7 +1,7 @@
 package com.sphereon.alfresco.blockchain.agent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sphereon.alfresco.blockchain.agent.backend.rest.model.VerifyNodesRequest;
+import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyNodesRequest;
 import com.sphereon.alfresco.blockchain.agent.config.RestControllerConfigTemplate;
 import com.sphereon.alfresco.blockchain.agent.config.TestConfig;
 import org.apache.commons.io.IOUtils;

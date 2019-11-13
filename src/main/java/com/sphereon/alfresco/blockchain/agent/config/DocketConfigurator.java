@@ -1,6 +1,6 @@
 package com.sphereon.alfresco.blockchain.agent.config;
 
-import com.sphereon.alfresco.blockchain.agent.backend.rest.Constants;
+import com.sphereon.alfresco.blockchain.agent.rest.Constants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
