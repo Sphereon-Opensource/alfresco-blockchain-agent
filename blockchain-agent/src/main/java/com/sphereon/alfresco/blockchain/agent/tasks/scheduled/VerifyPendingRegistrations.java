@@ -1,8 +1,8 @@
 package com.sphereon.alfresco.blockchain.agent.tasks.scheduled;
 
-import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
 import com.alfresco.apis.handler.ApiException;
 import com.alfresco.apis.model.ResultNode;
+import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -46,8 +46,8 @@ public class VerifyPendingRegistrations {
             });
         } catch (ApiException e) {
             logger.error("An error occurred whilst listing sites: " + e.getResponseBody(), e);
-        } catch (Throwable throwable) {
-            logger.error("An error occurred whilst listing sites", throwable);
+        } catch (Exception exception) {
+            logger.error("An error occurred whilst listing sites", exception);
         }
     }
 }

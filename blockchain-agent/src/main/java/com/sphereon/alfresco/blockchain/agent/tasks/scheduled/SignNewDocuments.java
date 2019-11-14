@@ -1,7 +1,7 @@
 package com.sphereon.alfresco.blockchain.agent.tasks.scheduled;
 
-import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
 import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
+import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -37,8 +37,8 @@ public class SignNewDocuments {
                             logger.info("Updating state to pending for document " + entry.getName() + " / " + entry.getId());
                             final var registrationState = AlfrescoBlockchainRegistrationState.REGISTERED;
                             this.alfrescoRepository.updateAlfrescoNodeWith(entry.getId(), registrationState);
-                        } catch (Throwable throwable) {
-                            logger.error(String.format("An error occurred whilst signing entry %s: %s", entry.getName(), throwable.getMessage()), throwable);
+                        } catch (Exception exception) {
+                            logger.error(String.format("An error occurred whilst signing entry %s: %s", entry.getName(), exception.getMessage()), exception);
                             final var registrationState = AlfrescoBlockchainRegistrationState.NOT_REGISTERED;
                             this.alfrescoRepository.updateAlfrescoNodeWith(entry.getId(), registrationState);
                         }

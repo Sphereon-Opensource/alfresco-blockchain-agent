@@ -47,8 +47,8 @@ public class ProofSignNewDocumentTask implements SignNewDocumentsTask {
         } catch (com.sphereon.sdk.blockchain.proof.handler.ApiException e) {
             logger.info("The apiClient base path is " + bcProofRegistrationApi.getApiClient().getBasePath());
             throw new RuntimeException(String.format(EXCEPTION_MESSAGE_ERROR_REGISTER, e.getCode(), e.getResponseBody()), e);
-        } catch (Exception throwable) {
-            throw new RuntimeException("An exception occurred whilst verifying content: " + throwable.getMessage(), throwable);
+        } catch (Exception exception) {
+            throw new RuntimeException("An exception occurred whilst verifying content: " + exception.getMessage(), exception);
         }
     }
 }

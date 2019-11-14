@@ -44,8 +44,8 @@ public class ProofVerifyPendingRegistrationsTask implements VerifyPendingRegistr
             return utils.toAlfrescoResponse(verifyResponse);
         } catch (com.sphereon.sdk.blockchain.proof.handler.ApiException e) {
             throw new RuntimeException("An error occurred whilst verifying content: " + e.getCode(), e);
-        } catch (Throwable throwable) {
-            throw new RuntimeException("An error occurred whilst verifying content: " + throwable.getMessage(), throwable);
+        } catch (Exception exception) {
+            throw new RuntimeException("An error occurred whilst verifying content: " + exception.getMessage(), exception);
         }
     }
 }

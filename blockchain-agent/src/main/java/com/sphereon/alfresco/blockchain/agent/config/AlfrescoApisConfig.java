@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
-import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
@@ -25,6 +24,7 @@ class AlfrescoApisConfig {
     private static final String CORE_API_PATH = "/alfresco/api/-default-/public/alfresco/versions/1";
     private static final String SEARCH_API_PATH = "/alfresco/api/-default-/public/search/versions/1";
     private static final String CMIS_API_PATH = "/alfresco/api/-default-/public/cmis/versions/1.1/atom";
+    private static final String HTTPS_PROTOCOL = "https://";
 
     private final ApiClient authenticationApiClient;
     private final ApiClient coreApiClient;
@@ -39,20 +39,13 @@ class AlfrescoApisConfig {
                        @Value("${sphereon.blockchain.agent.alfresco.dns-name}") final String alfrescoDnsName,
                        @Value("${sphereon.blockchain.agent.alfresco.username}") final String userName,
                        @Value("${sphereon.blockchain.agent.alfresco.password}") final String password) {
-        this.authenticationApiClient = new ApiClient();
-        this.coreApiClient = new ApiClient();
-        this.searchApiClient = new ApiClient();
+        this.authenticationApiClient = createClient(AUTHENTICATION_API_PATH);
+        this.coreApiClient = createClient(CORE_API_PATH);
+        this.searchApiClient = createClient(SEARCH_API_PATH);
         this.connectionTimeout = connectionTimeout;
         this.alfrescoDnsName = alfrescoDnsName;
         this.userName = userName; // from system env
         this.password = password; // from system env
-    }
-
-    @PostConstruct
-    void init() {
-        configureClient(authenticationApiClient, AUTHENTICATION_API_PATH);
-        configureClient(coreApiClient, CORE_API_PATH);
-        configureClient(searchApiClient, SEARCH_API_PATH);
     }
 
     @Bean
@@ -100,15 +93,19 @@ class AlfrescoApisConfig {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     ApiClient cmisApiClient() {
-        final var cmisApiClient = new ApiClient();
-        configureClient(cmisApiClient, CMIS_API_PATH);
-        return cmisApiClient;
+        return createClient(CMIS_API_PATH);
     }
 
-    private void configureClient(final ApiClient apiClient, final String apiPath) {
-        configureClientAuthentication(apiClient);
-        apiClient.setBasePath("https://" + alfrescoDnsName + apiPath);
-        configureClientTimeouts(apiClient);
+    private ApiClient createClient(final String apiPath) {
+        final var client = new ApiClient();
+        configureClientAuthentication(client);
+        configureEndpoint(client, apiPath);
+        configureClientTimeouts(client);
+        return client;
+    }
+
+    private void configureEndpoint(final ApiClient client, final String apiPath) {
+        client.setBasePath(HTTPS_PROTOCOL + alfrescoDnsName + apiPath);
     }
 
     private void configureClientTimeouts(final ApiClient apiClient) {
