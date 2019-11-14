@@ -10,9 +10,11 @@ import com.sphereon.sdk.blockchain.proof.handler.ApiException;
 import com.sphereon.sdk.blockchain.proof.model.ContentRequest;
 import com.sphereon.sdk.blockchain.proof.model.VerifyContentResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("sphereon-proof-api")
 public class ProofVerificationTask implements VerifyRegistrationTask {
     private final VerificationApi bcProofVerificationApi;
     private final TokenRequest tokenRequester;
