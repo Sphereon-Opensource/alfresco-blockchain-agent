@@ -16,7 +16,6 @@
     <properties>
         <blockchain-proof-sdk-java8.version>0.10.0</blockchain-proof-sdk-java8.version>
         <easy-blockchain-lib.version>0.1.3</easy-blockchain-lib.version>
-        <crypto-keys-sdk-java8-okhttp-gson.version>0.9.0</crypto-keys-sdk-java8-okhttp-gson.version>
         <authentication-lib.version>0.1.4-SNAPSHOT</authentication-lib.version>
         <sphereon-commons-bom.version>1.0.4-SNAPSHOT</sphereon-commons-bom.version>
     </properties>
@@ -54,11 +53,6 @@
             <groupId>com.sphereon.public</groupId>
             <artifactId>easy-blockchain-lib-main</artifactId>
             <version>${easy-blockchain-lib.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sphereon.sdk</groupId>
-            <artifactId>crypto-keys-sdk-java8-okhttp-gson</artifactId>
-            <version>${crypto-keys-sdk-java8-okhttp-gson.version}</version>
         </dependency>
 
         <dependency>

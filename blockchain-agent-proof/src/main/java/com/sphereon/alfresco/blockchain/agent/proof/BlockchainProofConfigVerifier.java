@@ -19,7 +19,7 @@ import static com.sphereon.sdk.blockchain.proof.model.ChainSettings.HashAlgorith
 import static com.sphereon.sdk.blockchain.proof.model.CreateConfigurationRequest.AccessModeEnum;
 
 /**
- * Task that verifies that the Blockchain Proof config is valid. Annotated with {@code @ApplicationListener} to run as startup-time check.
+ * Task that verifies that the Blockchain Proof config is valid. Implements {@code @ApplicationListener} to run as startup-time check.
  */
 @Component
 public class BlockchainProofConfigVerifier implements ApplicationListener<ApplicationReadyEvent> {
