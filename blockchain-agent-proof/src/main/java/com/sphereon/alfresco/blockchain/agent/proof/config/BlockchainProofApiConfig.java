@@ -42,6 +42,7 @@ public class BlockchainProofApiConfig {
 
     @Bean
     AuthenticationApi authenticationApi() {
+        // TODO: Use application properties instead of environment variables
         final var configBuilder = new ApiConfiguration.Builder()
                 .withApplication(applicationName)
                 .withPersistenceType(PersistenceType.SYSTEM_ENVIRONMENT)
