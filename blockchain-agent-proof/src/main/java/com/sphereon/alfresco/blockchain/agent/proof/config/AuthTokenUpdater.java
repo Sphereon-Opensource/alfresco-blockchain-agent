@@ -7,12 +7,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
-public class TokenUpdater {
+public class AuthTokenUpdater {
     private final AuthenticationApi storeElevatedAuthenticationApi;
     private String currentAccessToken;
     private Set<UpdateEvent> updateEvents;
 
-    public TokenUpdater(final AuthenticationApi storeElevatedAuthenticationApi) {
+    public AuthTokenUpdater(final AuthenticationApi storeElevatedAuthenticationApi) {
         this.storeElevatedAuthenticationApi = storeElevatedAuthenticationApi;
         this.updateEvents = new HashSet<>();
     }
