@@ -42,6 +42,7 @@ To use the Sphereon Blockchain Proof API, configure the following properties:
 ```
 BLOCKCHAIN_CONSUMER_KEY=uTqiAhah_lcYM3VZdNg34yrzvqsa
 BLOCKCHAIN_CONSUMER_SECRET=y8NxjeMMEb8fNN_heZK7f1lEqaEa
+sphereon.store.application-name
 sphereon.blockchain.agent.blockchain-proof.config-name=alfresco-blockchain-factom
 sphereon.blockchain.agent.blockchain-proof.context=factom
 ```

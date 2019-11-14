@@ -3,15 +3,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.sphereon</groupId>
-    <artifactId>alfresco-blockchain-agent</artifactId>
-    <packaging>jar</packaging>
+    <groupId>com.sphereon.alfresco.blockchain-agent</groupId>
+    <artifactId>blockchain-agent-parent</artifactId>
+    <name>blockchain-agent-parent</name>
     <version>0.0.2-SNAPSHOT</version>
-    <name>alfresco-blockchain-agent</name>
+    <packaging>pom</packaging>
 
-    <prerequisites>
-        <maven>3</maven>
-    </prerequisites>
+    <modules>
+        <module>blockchain-agent</module>
+        <module>blockchain-agent-proof</module>
+        <module>blockchain-agent-factom</module>
+    </modules>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -23,218 +25,25 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
-        <maven.compiler.source>10</maven.compiler.source>
-        <maven.compiler.target>10</maven.compiler.target>
-
-        <main.class>com.sphereon.alfresco.blockchain.agent.AlfrescoBlockchainAgentApp</main.class>
-        <http.port>22240</http.port>
-        <health.port>22241</health.port>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
 
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
-
-
-        <version.compiler.plugin>3.5.1</version.compiler.plugin>
-        <keycloak.version>2.1.0.Final</keycloak.version>
-        <spring-cloud-dependencies.version>Brixton.SR4</spring-cloud-dependencies.version>
-        <spring-cloud-netflix-dependencies.version>1.1.2.RELEASE</spring-cloud-netflix-dependencies.version>
-
-        <blockchain-proof-sdk-java8.version>0.10.0</blockchain-proof-sdk-java8.version>
-        <easy-blockchain-lib.version>0.1.3</easy-blockchain-lib.version>
-        <crypto-keys-sdk-java8-okhttp-gson.version>0.9.0</crypto-keys-sdk-java8-okhttp-gson.version>
-        <authentication-lib.version>0.1.4-SNAPSHOT</authentication-lib.version>
-        <sphereon-commons-bom.version>1.0.4-SNAPSHOT</sphereon-commons-bom.version>
-        <springfox.version>2.9.2</springfox.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.sphereon.ms</groupId>
-                <artifactId>sphereon-ms-commons-bom</artifactId>
-                <version>${sphereon-commons-bom.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-
-    <dependencies>
-        <dependency>
-            <groupId>com.sphereon.public</groupId>
-            <artifactId>authentication-lib-main</artifactId>
-            <version>${authentication-lib.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!--http://nexus.qa.sphereon.com/repository/bif/-->
-        <dependency>
-            <groupId>org.blockchain-innovation.factom.client</groupId>
-            <artifactId>factom-client-impl</artifactId>
-            <version>0.2.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.blockchain-innovation.factom.client</groupId>
-            <artifactId>logger-slf4j</artifactId>
-            <version>0.2.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.blockchain-innovation.factom.client</groupId>
-            <artifactId>json-converter-gson</artifactId>
-            <version>0.2.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.blockchain-innovation.factom.client</groupId>
-            <artifactId>spring-boot-support</artifactId>
-            <version>0.2.1</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.blockchain-innovation.factom.client</groupId>
-            <artifactId>factom-client-api</artifactId>
-            <version>0.2.1-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>25.1-jre</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>1.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-smile</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-mrbean</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-jaxb-annotations</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-crypto</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.alfresco.sdk</groupId>
-            <artifactId>alfresco-apis-java8-okhttp-gson</artifactId>
-            <version>1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sphereon.sdk</groupId>
-            <artifactId>blockchain-proof-sdk-java8-okhttp-gson</artifactId>
-            <version>${blockchain-proof-sdk-java8.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sphereon.public</groupId>
-            <artifactId>easy-blockchain-lib-main</artifactId>
-            <version>${easy-blockchain-lib.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sphereon.sdk</groupId>
-            <artifactId>crypto-keys-sdk-java8-okhttp-gson</artifactId>
-            <version>${crypto-keys-sdk-java8-okhttp-gson.version}</version>
-        </dependency>
-
-        <!-- Swagger (springfox) dependencies -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${springfox.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-core</artifactId>
-            <version>${springfox.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-bean-validators</artifactId>
-            <version>${springfox.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${springfox.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sphereon.ms</groupId>
-            <artifactId>commons-response</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.11</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-ext</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/webapp</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <executable>true</executable>
-                </configuration>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.0</version>
+                    <configuration>
+                        <source>11</source>
+                        <target>11</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 </project>
