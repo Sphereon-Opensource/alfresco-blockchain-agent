@@ -33,8 +33,8 @@ public class BlockchainProofConfigVerifier implements ApplicationListener<Applic
     private final String context;
 
     public BlockchainProofConfigVerifier(final ConfigurationApi configurationApi,
-                                         @Value("${blockchain.config-name:#{null}}") final String configName,
-                                         @Value("${blockchain.context:factom}") final String context) {
+                                         @Value("${sphereon.blockchain.agent.blockchain-proof.config-name}") final String configName,
+                                         @Value("${sphereon.blockchain.agent.blockchain-proof.context:factom}") final String context) {
         this.configurationApi = configurationApi;
         this.configName = configName;
         this.context = context;

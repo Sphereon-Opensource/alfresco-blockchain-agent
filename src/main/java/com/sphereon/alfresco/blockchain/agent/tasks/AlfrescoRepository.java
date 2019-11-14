@@ -49,8 +49,8 @@ public class AlfrescoRepository {
     public AlfrescoRepository(final SearchApi alfrescoSearchApi,
                               final ApiClient cmisApiClient,
                               final NodesApi alfrescoNodesApi,
-                              @Value("${alfresco.query.model}") final String model,
-                              @Value("${alfresco.query.registration-state:RegistrationState}") final String registrationStateProperty) {
+                              @Value("${sphereon.blockchain.agent.alfresco.query.model}") final String model,
+                              @Value("${sphereon.blockchain.agent.alfresco.query.registration-state:RegistrationState}") final String registrationStateProperty) {
         this.alfrescoSearchApi = alfrescoSearchApi;
         this.cmisApiClient = cmisApiClient;
         this.alfrescoNodesApi = alfrescoNodesApi;

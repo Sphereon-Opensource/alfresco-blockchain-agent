@@ -15,7 +15,7 @@ public class DocketConfigurator implements SimplifiedDocketConfigurator {
     private final String dnsName;
 
     public DocketConfigurator(@Value(value = "${alfresco-blockchain.api.version}") final String apiVersion,
-                              @Value(value = "${alfresco.dns-name}") final String dnsName) {
+                              @Value(value = "${sphereon.blockchain.agent.alfresco.dns-name}") final String dnsName) {
         this.apiVersion = apiVersion;
         this.dnsName = dnsName;
     }

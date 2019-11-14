@@ -33,9 +33,9 @@ public class Signer {
 
     private KeyPair keyPair;
 
-    public Signer(@Value("${BLOCKCHAIN_CERT_PASSWORD:#{null}}") final String certificatePassword,
-                  @Value("${BLOCKCHAIN_CERT_PATH:#{null}}") final String certificatePathString,
-                  @Value("${BLOCKCHAIN_CERT_ALIAS:#{null}}") final String certificateAlias) {
+    public Signer(@Value("${sphereon.blockchain.agent.cert-password}") final String certificatePassword,
+                  @Value("${sphereon.blockchain.agent.cert-path}") final String certificatePathString,
+                  @Value("${sphereon.blockchain.agent.cert-alias}") final String certificateAlias) {
         this.certificatePassword = certificatePassword;
         this.certificatePathString = certificatePathString;
         this.certificateAlias = certificateAlias;
@@ -43,8 +43,8 @@ public class Signer {
 
     @PostConstruct
     public void init() {
-        Assert.notNull(certificatePathString, "The environment variable BLOCKCHAIN_CERT_PATH is not set.");
-        Assert.notNull(certificatePassword, "The environment variable BLOCKCHAIN_CERT_PASSWORD is not set.");
+        Assert.notNull(certificatePathString, "No certificate path received. See README for details on configuration.");
+        Assert.notNull(certificatePassword, "No certificate password received. See README for details on configuration.");
 
         try {
             final var keystore = KeyStore.getInstance("PKCS12");

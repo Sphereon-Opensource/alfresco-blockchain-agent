@@ -35,10 +35,10 @@ class AlfrescoApisConfig {
     private final String userName;
     private final String password;
 
-    AlfrescoApisConfig(@Value("${alfresco.api-client.timeout:40000}") final int connectionTimeout,
-                       @Value("${alfresco.dns-name}") final String alfrescoDnsName,
-                       @Value("${alfresco-username}") final String userName,
-                       @Value("${alfresco-password}") final String password) {
+    AlfrescoApisConfig(@Value("${sphereon.blockchain.agent.alfresco.api-client.timeout:40000}") final int connectionTimeout,
+                       @Value("${sphereon.blockchain.agent.alfresco.dns-name}") final String alfrescoDnsName,
+                       @Value("${sphereon.blockchain.agent.alfresco.username}") final String userName,
+                       @Value("${sphereon.blockchain.agent.alfresco.password}") final String password) {
         this.authenticationApiClient = new ApiClient();
         this.coreApiClient = new ApiClient();
         this.searchApiClient = new ApiClient();

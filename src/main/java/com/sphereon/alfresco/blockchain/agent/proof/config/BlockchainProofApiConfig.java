@@ -42,7 +42,7 @@ public class BlockchainProofApiConfig {
 
     @Bean
     AuthenticationApi authenticationApi() {
-        ApiConfiguration.Builder configBuilder = new ApiConfiguration.Builder()
+        final var configBuilder = new ApiConfiguration.Builder()
                 .withApplication(applicationName)
                 .withPersistenceType(PersistenceType.SYSTEM_ENVIRONMENT)
                 .withEnvVarPrefix("BLOCKCHAIN");
