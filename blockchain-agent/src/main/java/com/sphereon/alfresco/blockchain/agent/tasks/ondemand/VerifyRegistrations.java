@@ -44,7 +44,7 @@ public class VerifyRegistrations {
             if (StringUtils.isNotEmpty(credentials)) {
                 this.updateCredentials(alfrescoRepository, credentials);
             }
-            alfrescoRepository.selectEntries(selectedNodeIds).stream()
+            alfrescoRepository.selectAlfrescoNodes(selectedNodeIds).stream()
                     .map(NodeEntry::getEntry)
                     .filter(entry -> {
                         final String entryCurrentState = getProperty(entry, "bc:RegistrationState");

@@ -29,7 +29,7 @@ public class VerifyPendingRegistrations {
     public synchronized void execute() {
         try {
             logger.info("Searching for documents with registration state " + PENDING_VERIFICATION);
-            this.alfrescoRepository.selectEntries(PENDING_VERIFICATION).forEach(rowEntry -> {
+            this.alfrescoRepository.selectAlfrescoNodes(PENDING_VERIFICATION).forEach(rowEntry -> {
                 ResultNode entry = rowEntry.getEntry();
                 logger.info("Found document " + entry.getName() + " / " + entry.getId());
                 var contentHash = this.alfrescoRepository.hashEntry(entry.getId());

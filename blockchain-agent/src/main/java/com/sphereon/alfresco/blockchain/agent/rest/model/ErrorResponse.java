@@ -21,7 +21,7 @@ public class ErrorResponse {
     }
 
     public ErrorResponse errors(List<Error> errors) {
-        this.errors = errors;
+        this.setErrors(errors);
         return this;
     }
 
@@ -36,7 +36,7 @@ public class ErrorResponse {
     }
 
     public void setErrors(List<Error> errors) {
-        this.errors = errors;
+        this.errors = new ArrayList<>(errors);
     }
 
     public boolean equals(final Object object) {

@@ -58,35 +58,38 @@ public class AlfrescoRepository {
         this.registrationStateProperty = registrationStateProperty;
     }
 
-    public List<ResultSetRowEntry> selectEntries(final AlfrescoBlockchainRegistrationState state) throws ApiException {
-        final SearchRequest request = new SearchRequest();
-        final RequestQuery query = new RequestQuery();
+    public List<ResultSetRowEntry> selectAlfrescoNodes(final AlfrescoBlockchainRegistrationState state) throws ApiException {
+        final var query = new RequestQuery();
         query.setLanguage(RequestQuery.LanguageEnum.AFTS);
         query.setQuery('{' + model + '}' + registrationStateProperty + ':' + state.getKey());
-        request.setQuery(query);
-        RequestInclude include = new RequestInclude();
+
+        final var include = new RequestInclude();
         include.add("properties");
+
+        final var request = new SearchRequest();
+        request.setQuery(query);
         request.include(include);
 
         final ResultSetPaging pagedResult = alfrescoSearchApi.search(request);
         return pagedResult.getList().getEntries();
     }
 
-    public List<NodeEntry> selectEntries(final List<String> alfrescoNodeIds) {
+    public List<NodeEntry> selectAlfrescoNodes(final List<String> alfrescoNodeIds) {
         final List<NodeEntry> nodeEntries = new ArrayList<>();
         final List<String> include = new ArrayList<>();
         include.add("properties");
 
-        alfrescoNodeIds.forEach(nodeId -> {
-            try {
-                nodeEntries.add(alfrescoNodesApi.getNode(nodeId, include, null, null));
-            } catch (ApiException e) {
-                String errorMessage = "http status: " + e.getCode() + "\r\n" + e.getResponseBody();
-                throw new RuntimeException(String.format(EXCEPTION_MESSAGE_GET_NODE, nodeId, errorMessage), e);
-            } catch (Exception exception) {
-                throw new RuntimeException(String.format(EXCEPTION_MESSAGE_GET_NODE, nodeId, exception.getMessage()), exception);
-            }
-        });
+        alfrescoNodeIds
+                .forEach(nodeId -> {
+                    try {
+                        nodeEntries.add(alfrescoNodesApi.getNode(nodeId, include, null, null));
+                    } catch (ApiException e) {
+                        String errorMessage = "http status: " + e.getCode() + "\r\n" + e.getResponseBody();
+                        throw new RuntimeException(String.format(EXCEPTION_MESSAGE_GET_NODE, nodeId, errorMessage), e);
+                    } catch (Exception exception) {
+                        throw new RuntimeException(String.format(EXCEPTION_MESSAGE_GET_NODE, nodeId, exception.getMessage()), exception);
+                    }
+                });
         return nodeEntries;
     }
 

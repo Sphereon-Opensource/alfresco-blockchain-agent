@@ -27,7 +27,7 @@ public class SignNewDocuments {
     public synchronized void execute() {
         try {
             logger.info("Searching for documents with registration state " + PENDING_REGISTRATION);
-            this.alfrescoRepository.selectEntries(PENDING_REGISTRATION)
+            this.alfrescoRepository.selectAlfrescoNodes(PENDING_REGISTRATION)
                     .forEach(rowEntry -> {
                         final var entry = rowEntry.getEntry();
                         try {

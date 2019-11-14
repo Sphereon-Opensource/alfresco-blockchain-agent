@@ -303,9 +303,9 @@ public class RestControllerConfigTemplate {
         private Predicate<String> pathSelector;
 
         private SphereonDocketConfig() {
-            pathMappings = new HashMap<>();
-            additionalTags = Sets.newHashSet();
-            apiSelector = RequestHandlerSelectors.any();
+            this.pathMappings = new HashMap<>();
+            this.additionalTags = Sets.newHashSet();
+            this.apiSelector = RequestHandlerSelectors.any();
         }
 
         public String getGatewayHostName() {
