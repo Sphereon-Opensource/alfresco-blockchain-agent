@@ -35,10 +35,10 @@ public class VerifyPendingRegistrations {
                 var contentHash = this.alfrescoRepository.hashEntry(entry.getId());
                 final var verifyResponse = this.pendingRegistrationsTask.verifyHash(contentHash);
                 if (verifyResponse.getRegistrationState() == REGISTERED) {
-                    logger.info("Updating state to pending for document " + entry.getName() + " / " + entry.getId());
                     final var registrationState = verifyResponse.getRegistrationState();
                     final var singleProofChainChainId = verifyResponse.getSingleProofChainId();
                     final var perHashProofChainChainId = verifyResponse.getPerHashProofChainId();
+                    logger.info("Updating state to {} for document {} / {}", registrationState, entry.getName(), entry.getId());
                     this.alfrescoRepository.updateAlfrescoNodeWith(entry.getId(), registrationState, verifyResponse.getRegistrationTime(), singleProofChainChainId, perHashProofChainChainId);
                 } else {
                     logger.info("Document " + entry.getName() + " / " + entry.getId() + " was not registered yet: " + verifyResponse.getRegistrationState());

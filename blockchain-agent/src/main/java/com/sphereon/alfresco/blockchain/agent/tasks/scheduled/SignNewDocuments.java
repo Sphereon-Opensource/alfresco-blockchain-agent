@@ -34,8 +34,8 @@ public class SignNewDocuments {
                             logger.info("Found document " + entry.getName() + " / " + entry.getId());
                             var contentHash = this.alfrescoRepository.hashEntry(entry.getId());
                             this.signNewDocumentsTask.registerEntry(contentHash);
-                            logger.info("Updating state to pending for document " + entry.getName() + " / " + entry.getId());
-                            final var registrationState = AlfrescoBlockchainRegistrationState.REGISTERED;
+                            final var registrationState = AlfrescoBlockchainRegistrationState.PENDING_VERIFICATION;
+                            logger.info("Updating state to {} for document {} / {}", registrationState, entry.getName(), entry.getId());
                             this.alfrescoRepository.updateAlfrescoNodeWith(entry.getId(), registrationState);
                         } catch (Exception exception) {
                             logger.error(String.format("An error occurred whilst signing entry %s: %s", entry.getName(), exception.getMessage()), exception);

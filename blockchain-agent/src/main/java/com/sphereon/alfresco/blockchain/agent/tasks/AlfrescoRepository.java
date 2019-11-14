@@ -138,6 +138,7 @@ public class AlfrescoRepository {
     }
 
     private String explorerLinkFrom(final String chainId) {
+        // TODO: Make configurable
         return "https://explorer.factoid.org/data?type=chain&key=" + chainId;
     }
 
@@ -148,7 +149,7 @@ public class AlfrescoRepository {
             RequestInclude include = new RequestInclude();
             include.add("properties");
             logger.info("Updating node " + alfrescoNodeId);
-            properties.forEach((key, value2) -> logger.info("  - " + key + '=' + value2));
+            properties.forEach((key, value) -> logger.info("  - " + key + '=' + value));
             alfrescoNodesApi.updateNode(alfrescoNodeId, update, include, null);
 
             logger.info("Node " + alfrescoNodeId + " updated");
