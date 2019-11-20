@@ -24,7 +24,7 @@ public class ProofVerifyPendingRegistrationsTask implements VerifyPendingRegistr
                                                final TokenRequest tokenRequester,
                                                final ProofApiUtils utils,
                                                final Signer signer,
-                                               @Value("${blockchain.config-name:#{null}}") final String proofApiConfigName) {
+                                               @Value("${sphereon.blockchain.agent.blockchain-proof.config-name:#{null}}") final String proofApiConfigName) {
         this.bcProofVerificationApi = bcProofVerificationApi;
         this.tokenRequester = tokenRequester;
         this.utils = utils;

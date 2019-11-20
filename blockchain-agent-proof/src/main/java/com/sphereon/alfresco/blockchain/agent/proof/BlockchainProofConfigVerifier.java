@@ -42,10 +42,14 @@ public class BlockchainProofConfigVerifier implements ApplicationListener<Applic
 
     @Override
     public void onApplicationEvent(@Nonnull final ApplicationReadyEvent applicationReadyEvent) {
-        verifyValidBlockchainProofApiConfig();
+        try {
+            assertValidBlockchainProofApiConfig();
+        } catch (ConfigurationNotFoundException e) {
+            createConfiguration();
+        }
     }
 
-    public void verifyValidBlockchainProofApiConfig() {
+    private void assertValidBlockchainProofApiConfig() throws ConfigurationNotFoundException {
         try {
             final var configResponse = configurationApi.getConfiguration(configName);
             Assert.notNull(configResponse, String.format(ASSERT_MESSAGE_GET_CONFIG, configName));
@@ -54,7 +58,7 @@ public class BlockchainProofConfigVerifier implements ApplicationListener<Applic
             if (e.getCode() != HttpStatus.NOT_FOUND.value()) {
                 throw new RuntimeException(String.format(EXCEPTION_MESSAGE_GET_CONFIG, configName, "" + e.getCode()), e);
             }
-            createConfiguration();
+            throw new ConfigurationNotFoundException();
         } catch (final Exception exception) {
             throw new RuntimeException(String.format(EXCEPTION_MESSAGE_GET_CONFIG, configName, exception.getMessage()), exception);
         }
