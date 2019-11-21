@@ -8,11 +8,9 @@ import com.sphereon.libs.authentication.api.TokenRequest;
 import com.sphereon.sdk.blockchain.proof.api.VerificationApi;
 import com.sphereon.sdk.blockchain.proof.model.ContentRequest;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("sphereon-proof-api")
 public class ProofVerifyPendingRegistrationsTask implements VerifyPendingRegistrationsTask {
     private final VerificationApi bcProofVerificationApi;
     private final TokenRequest tokenRequester;

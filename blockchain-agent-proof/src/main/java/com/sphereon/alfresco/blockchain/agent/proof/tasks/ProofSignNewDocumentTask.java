@@ -8,11 +8,9 @@ import com.sphereon.sdk.blockchain.proof.api.RegistrationApi;
 import com.sphereon.sdk.blockchain.proof.model.ContentRequest;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("sphereon-proof-api")
 public class ProofSignNewDocumentTask implements SignNewDocumentsTask {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProofSignNewDocumentTask.class);
 
