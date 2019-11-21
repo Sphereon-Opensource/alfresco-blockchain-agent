@@ -54,12 +54,12 @@ public class VerifyRegistrations {
                         logger.info("Found document " + entry.getName() + " / " + entry.getId());
                         final var contentHash = alfrescoRepository.hashEntry(entry.getId());
                         final var response = verificationTask.verify(contentHash);
-                        contentResponses.add(response);
                         final var registrationState = response.getRegistrationState();
                         final var registrationTime = response.getRegistrationTime();
                         final var singleProofChainChainId = response.getSingleProofChainId();
                         final var perHashProofChainChainId = response.getPerHashProofChainId();
                         alfrescoRepository.updateAlfrescoNodeWith(entry.getId(), registrationState, registrationTime, singleProofChainChainId, perHashProofChainChainId);
+                        contentResponses.add(response);
                         if (response.getRegistrationState() != REGISTERED) {
                             logger.info("Document " + entry.getName() + " / " + entry.getId() + " was not registered yet: " + response.getRegistrationState());
                         }
