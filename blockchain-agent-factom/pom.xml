@@ -29,5 +29,30 @@
             <artifactId>blockchain-agent</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.blockchain-innovation.factom.client</groupId>
+            <artifactId>factom-client-impl</artifactId>
+            <version>0.2.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.blockchain-innovation.factom.client</groupId>
+            <artifactId>logger-slf4j</artifactId>
+            <version>0.2.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.blockchain-innovation.factom.client</groupId>
+            <artifactId>json-converter-gson</artifactId>
+            <version>0.2.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.blockchain-innovation.factom.client</groupId>
+            <artifactId>spring-boot-support</artifactId>
+            <version>0.2.1</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>
