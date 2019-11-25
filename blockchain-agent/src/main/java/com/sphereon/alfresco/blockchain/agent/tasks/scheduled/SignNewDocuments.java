@@ -2,6 +2,7 @@ package com.sphereon.alfresco.blockchain.agent.tasks.scheduled;
 
 import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
+import com.sphereon.libs.blockchain.commons.Digest;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -16,14 +17,17 @@ public class SignNewDocuments {
 
     private final AlfrescoRepository alfrescoRepository;
     private final SignNewDocumentsTask signNewDocumentsTask;
+    private final Digest.Algorithm hashAlgorithm;
 
     public SignNewDocuments(final AlfrescoRepository alfrescoRepository,
-                            final SignNewDocumentsTask signNewDocumentsTask) {
+                            final SignNewDocumentsTask signNewDocumentsTask,
+                            final Digest.Algorithm hashAlgorithm) {
         this.alfrescoRepository = alfrescoRepository;
         this.signNewDocumentsTask = signNewDocumentsTask;
+        this.hashAlgorithm = hashAlgorithm;
     }
 
-    @Scheduled(fixedRate = EXECUTION_RATE)
+    @Scheduled(fixedRate = EXECUTION_RATE, initialDelay = 1000)
     public synchronized void execute() {
         try {
             logger.info("Searching for documents with registration state " + PENDING_REGISTRATION);
@@ -32,8 +36,8 @@ public class SignNewDocuments {
                         final var entry = rowEntry.getEntry();
                         try {
                             logger.info("Found document " + entry.getName() + " / " + entry.getId());
-                            var contentHash = this.alfrescoRepository.hashEntry(entry.getId());
-                            this.signNewDocumentsTask.registerEntry(contentHash);
+                            final var contentHash = this.alfrescoRepository.hashEntry(entry.getId(), hashAlgorithm);
+                            this.signNewDocumentsTask.registerEntry(contentHash, hashAlgorithm);
                             final var registrationState = AlfrescoBlockchainRegistrationState.PENDING_VERIFICATION;
                             logger.info("Updating state to {} for document {} / {}", registrationState, entry.getName(), entry.getId());
                             this.alfrescoRepository.updateAlfrescoNodeWith(entry.getId(), registrationState);

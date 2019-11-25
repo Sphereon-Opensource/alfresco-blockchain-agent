@@ -11,6 +11,10 @@
 
     <artifactId>blockchain-agent-factom</artifactId>
 
+    <properties>
+        <factom-client.version>0.2.1</factom-client.version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -32,26 +36,32 @@
 
         <dependency>
             <groupId>org.blockchain-innovation.factom.client</groupId>
+            <artifactId>factom-client-api</artifactId>
+            <version>${factom-client.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.blockchain-innovation.factom.client</groupId>
             <artifactId>factom-client-impl</artifactId>
-            <version>0.2.1</version>
+            <version>${factom-client.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.blockchain-innovation.factom.client</groupId>
             <artifactId>logger-slf4j</artifactId>
-            <version>0.2.1</version>
+            <version>${factom-client.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.blockchain-innovation.factom.client</groupId>
             <artifactId>json-converter-gson</artifactId>
-            <version>0.2.1</version>
+            <version>${factom-client.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.blockchain-innovation.factom.client</groupId>
             <artifactId>spring-boot-support</artifactId>
-            <version>0.2.1</version>
+            <version>${factom-client.version}</version>
             <scope>compile</scope>
         </dependency>
 

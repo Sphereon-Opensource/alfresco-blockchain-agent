@@ -5,6 +5,7 @@ import com.alfresco.apis.model.NodeEntry;
 import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
+import com.sphereon.libs.blockchain.commons.Digest;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.ObjectFactory;
@@ -36,14 +37,18 @@ public class VerifyRegistrationsTest {
     private AlfrescoRepository alfrescoRepositoryMock;
     private VerifyRegistrationTask verificationTask;
     private Clock dummyClock;
+    private Digest.Algorithm hashAlgorithm;
 
     @Before
     public void setup() {
         this.dummyClock = Clock.fixed(Instant.ofEpochSecond(123456), ZoneOffset.ofHours(1));
+
         this.alfrescoRepositoryMock = mock(AlfrescoRepository.class);
         final ObjectFactory<AlfrescoRepository> factory = () -> alfrescoRepositoryMock;
         this.verificationTask = mock(VerifyRegistrationTask.class);
-        this.verification = new VerifyRegistrations(factory, verificationTask);
+
+        this.hashAlgorithm = Digest.Algorithm.SHA_256;
+        this.verification = new VerifyRegistrations(factory, verificationTask, hashAlgorithm);
     }
 
     @Test
@@ -69,7 +74,7 @@ public class VerifyRegistrationsTest {
 
         for (var id : asList("2", "3", "4")) {
             final byte[] hash = ("dummy-hash-" + id).getBytes();
-            when(alfrescoRepositoryMock.hashEntry(eq(id)))
+            when(alfrescoRepositoryMock.hashEntry(eq(id), eq(hashAlgorithm)))
                     .thenReturn(hash);
 
             final var response = new VerifyContentAlfrescoResponse();
@@ -86,7 +91,7 @@ public class VerifyRegistrationsTest {
         assertThat(result.get(0).getRegistrationTime()).isEqualTo(OffsetDateTime.now(dummyClock));
 
         verify(alfrescoRepositoryMock).selectAlfrescoNodes(eq(nodeIds));
-        verify(alfrescoRepositoryMock, times(3)).hashEntry(anyString());
+        verify(alfrescoRepositoryMock, times(3)).hashEntry(anyString(), eq(hashAlgorithm));
 
         verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("2", REGISTERED, OffsetDateTime.now(dummyClock), null, null);
         verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("3", REGISTERED, OffsetDateTime.now(dummyClock), null, null);
@@ -114,7 +119,7 @@ public class VerifyRegistrationsTest {
 
         for (var id : asList("2", "3")) {
             final byte[] hash = ("dummy-hash-" + id).getBytes();
-            when(alfrescoRepositoryMock.hashEntry(eq(id)))
+            when(alfrescoRepositoryMock.hashEntry(eq(id), eq(hashAlgorithm)))
                     .thenReturn(hash);
 
             final var response = new VerifyContentAlfrescoResponse();
@@ -134,7 +139,7 @@ public class VerifyRegistrationsTest {
         assertThat(result.get(0).getRegistrationTime()).isEqualTo(OffsetDateTime.now(dummyClock));
 
         verify(alfrescoRepositoryMock).selectAlfrescoNodes(eq(nodeIds));
-        verify(alfrescoRepositoryMock, times(2)).hashEntry(anyString());
+        verify(alfrescoRepositoryMock, times(2)).hashEntry(anyString(), eq(hashAlgorithm));
 
         verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("2", REGISTERED, OffsetDateTime.now(dummyClock), null, null);
         verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("3", REGISTERED, OffsetDateTime.now(dummyClock), null, null);

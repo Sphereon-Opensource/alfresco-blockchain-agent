@@ -1,5 +1,6 @@
 package com.sphereon.alfresco.blockchain.agent.factom;
 
+import com.sphereon.libs.blockchain.commons.Digest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,6 @@ public class FactomSignNewDocumentTaskTest {
 
     @Test
     public void testRegisterEntry() {
-        this.factomSignNewDocumentTask.registerEntry(new byte[0]);
+        this.factomSignNewDocumentTask.registerEntry("Foo".getBytes(), Digest.Algorithm.SHA_256);
     }
 }

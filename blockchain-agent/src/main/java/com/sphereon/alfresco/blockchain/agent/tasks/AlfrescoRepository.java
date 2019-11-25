@@ -93,14 +93,14 @@ public class AlfrescoRepository {
         return nodeEntries;
     }
 
-    public byte[] hashEntry(final String alfrescoNodeId) {
+    public byte[] hashEntry(final String alfrescoNodeId, Digest.Algorithm hashAlgorithm) {
         final String[] localVarAuthNames = new String[]{"basicAuth"};
         try {
             var call = cmisApiClient.buildCall("/content", "GET", List.of(new Pair("id", alfrescoNodeId)), null,
                     new HashMap<>(), null, localVarAuthNames, null);
             var response = call.execute();
             if (response.code() == 200) {
-                return Digest.getInstance().getHashAsHex(Digest.Algorithm.SHA_256, response.body().byteStream()); // TODO: make configurable
+                return Digest.getInstance().getHashAsHex(hashAlgorithm, response.body().byteStream());
             }
             throw new RuntimeException("Content request returned http code " + response.code());
         } catch (ApiException e) {

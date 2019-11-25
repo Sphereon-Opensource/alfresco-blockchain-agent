@@ -1,10 +1,11 @@
 package com.sphereon.alfresco.blockchain.agent.tasks.ondemand;
 
-import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
-import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
 import com.alfresco.apis.model.Node;
 import com.alfresco.apis.model.NodeEntry;
 import com.google.common.base.Charsets;
+import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
+import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
+import com.sphereon.libs.blockchain.commons.Digest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,11 +30,14 @@ public class VerifyRegistrations {
 
     private final ObjectFactory<AlfrescoRepository> alfrescoRepositoryFactory;
     private final VerifyRegistrationTask verificationTask;
+    private final Digest.Algorithm hashAlgorithm;
 
     public VerifyRegistrations(final ObjectFactory<AlfrescoRepository> alfrescoRepositoryFactory,
-                               final VerifyRegistrationTask verificationTask) {
+                               final VerifyRegistrationTask verificationTask,
+                               final Digest.Algorithm hashAlgorithm) {
         this.alfrescoRepositoryFactory = alfrescoRepositoryFactory;
         this.verificationTask = verificationTask;
+        this.hashAlgorithm = hashAlgorithm;
     }
 
     public List<VerifyContentAlfrescoResponse> execute(final List<String> selectedNodeIds,
@@ -52,7 +56,7 @@ public class VerifyRegistrations {
                     })
                     .forEach(entry -> {
                         logger.info("Found document " + entry.getName() + " / " + entry.getId());
-                        final var contentHash = alfrescoRepository.hashEntry(entry.getId());
+                        final var contentHash = alfrescoRepository.hashEntry(entry.getId(), hashAlgorithm);
                         final var response = verificationTask.verify(contentHash);
                         final var registrationState = response.getRegistrationState();
                         final var registrationTime = response.getRegistrationTime();

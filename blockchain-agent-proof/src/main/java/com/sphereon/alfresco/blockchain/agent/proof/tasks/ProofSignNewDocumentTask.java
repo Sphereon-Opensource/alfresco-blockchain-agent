@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.sphereon.alfresco.blockchain.agent.tasks.scheduled.SignNewDocumentsTask;
 import com.sphereon.alfresco.blockchain.agent.utils.Signer;
 import com.sphereon.libs.authentication.api.TokenRequest;
+import com.sphereon.libs.blockchain.commons.Digest;
 import com.sphereon.sdk.blockchain.proof.api.RegistrationApi;
 import com.sphereon.sdk.blockchain.proof.model.ContentRequest;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class ProofSignNewDocumentTask implements SignNewDocumentsTask {
     }
 
     @Override
-    public void registerEntry(byte[] contentHash) {
+    public void registerEntry(byte[] contentHash, Digest.Algorithm algorithm) {
         tokenRequester.execute();
         var contentRequest = new ContentRequest();
         contentRequest.setContent(contentHash);
