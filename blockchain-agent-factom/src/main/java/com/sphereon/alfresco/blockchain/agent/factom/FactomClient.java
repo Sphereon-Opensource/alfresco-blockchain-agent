@@ -7,8 +7,11 @@ import org.blockchain_innovation.factom.client.api.errors.FactomRuntimeException
 import org.blockchain_innovation.factom.client.api.model.Address;
 import org.blockchain_innovation.factom.client.api.model.Chain;
 import org.blockchain_innovation.factom.client.api.model.Entry;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.ChainHeadResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitChainResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.CommitEntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryBlockResponse;
+import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryResponse;
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
@@ -17,7 +20,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+
+import static java.util.Optional.empty;
 
 @Component
 public class FactomClient {
@@ -34,42 +40,14 @@ public class FactomClient {
     }
 
     public void postEntryToChain(final Entry entry) {
-        final var composedEntry = composeEntry(entry);
-        commitEntry(composedEntry.getResult());
-        revealEntry(composedEntry.getResult());
-    }
+        final var postEntryToChain = composeEntry(entry)
+                .thenCompose(composedEntry -> commitEntry(composedEntry)
+                        .thenCompose(commitEntry -> revealEntry(composedEntry)));
 
-    private void revealEntry(ComposeResponse commitResult) {
         try {
-            final var revealResponse = this.factomdClient.revealEntry(commitResult.getReveal().getParams().getEntry()).get();
-            if (revealResponse == null || 200 != revealResponse.getHTTPResponseCode()) {
-                throw new FactomRuntimeException("Error retrieving response from Factom daemon on reveal-entry");
-            }
+            postEntryToChain.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new FactomRuntimeException("Error retrieving response from Factom daemon on reveal-entry");
-        }
-    }
-
-    private void commitEntry(ComposeResponse commitResult) {
-        try {
-            final var commitEntryResponse = this.factomdClient.commitEntry(commitResult.getCommit().getParams().getMessage()).get();
-            if (commitEntryResponse == null || 200 != commitEntryResponse.getHTTPResponseCode()) {
-                throw new FactomRuntimeException("Error retrieving response from Factom daemon on commit-entry");
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new FactomRuntimeException("Error retrieving response from Factom daemon on commit-entry");
-        }
-    }
-
-    private FactomResponse<ComposeResponse> composeEntry(final Entry entry) {
-        try {
-            final var composeResponse = this.walletdClient.composeEntry(entry, this.entryCreditsAddress).get();
-            if (composeResponse == null || 200 != composeResponse.getHTTPResponseCode()) {
-                throw new FactomRuntimeException("Error retrieving response from Factom daemon on compose-entry");
-            }
-            return composeResponse;
-        } catch (InterruptedException | ExecutionException e) {
-            throw new FactomRuntimeException("Error retrieving response from Factom daemon on compose-entry");
+            throw new FactomRuntimeException("Error retrieving response from Factom daemon");
         }
     }
 
@@ -77,108 +55,109 @@ public class FactomClient {
         final var chain = new Chain();
         chain.setFirstEntry(entry);
 
-        final var chainResult = composeChain(chain);
+        final CompletableFuture<RevealResponse> createChain = composeChain(chain)
+                .thenCompose(composeResponse -> commitChain(composeResponse.getCommit())
+                        .thenCompose(commitResult -> revealChain(composeResponse.getReveal())));
 
-        commitChain(chainResult);
-
-        return revealChain(chainResult);
+        try {
+            return createChain.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new FactomRuntimeException("Error retrieving response from Factom daemon on creating chain");
+        }
     }
 
     public Optional<Entry> verifyEntry(final String chainId, final byte[] contentHash) {
-        try {
-            final var chainHeadResponse = this.factomdClient.chainHead(chainId).get();
-            if (chainHeadResponse == null || 200 != chainHeadResponse.getHTTPResponseCode()) {
-                throw new FactomRuntimeException("Error retrieving response from Factom daemon on getting chain-head");
-            }
-            final var keyMerkleRoot = chainHeadResponse.getResult().getChainHead();
-            return getEntryFromMerkleRoot(keyMerkleRoot, contentHash);
-        } catch (InterruptedException | ExecutionException e) {
-            throw new FactomRuntimeException("Error retrieving response from Factom daemon on getting chain-head");
-        }
-    }
-
-    private RevealResponse revealChain(FactomResponse<ComposeResponse> chainResult) {
-        try {
-            final var revealResponse = this.factomdClient.revealChain(chainResult.getResult().getReveal().getParams().getEntry())
-                    .get();
-            if (revealResponse == null || 200 != revealResponse.getHTTPResponseCode()) {
-                throw new FactomRuntimeException("Error communicating with Factom daemon on reveal-chain");
-            }
-            return revealResponse.getResult();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new FactomRuntimeException("Error communicating with Factom daemon on reveal-chain");
-        }
-    }
-
-    private FactomResponse<CommitChainResponse> commitChain(FactomResponse<ComposeResponse> chainResult) {
-        try {
-            final var commitMessage = chainResult.getResult().getCommit().getParams().getMessage();
-            final FactomResponse<CommitChainResponse> commitResult = this.factomdClient.commitChain(commitMessage).get();
-            if (commitResult == null || 200 != commitResult.getHTTPResponseCode()) {
-                throw new FactomRuntimeException("Error communicating with Factom daemon on commit-chain");
-            }
-            return commitResult;
-        } catch (ExecutionException | InterruptedException e) {
-            throw new FactomRuntimeException("Error communicating with Factom daemon on commit-chain");
-        }
-    }
-
-    private FactomResponse<ComposeResponse> composeChain(Chain chain) {
-        try {
-            final FactomResponse<ComposeResponse> composeResponse = this.walletdClient.composeChain(chain, this.entryCreditsAddress).get();
-            if (composeResponse == null || 200 != composeResponse.getHTTPResponseCode()) {
-                throw new FactomRuntimeException("Error communicating with Factom-wallet daemon on compose-chain");
-            }
-            return composeResponse;
-        } catch (ExecutionException | InterruptedException e) {
-            throw new FactomRuntimeException("Error communicating with Factom-wallet daemon on compose-chain");
-        }
-    }
-
-    private Optional<Entry> getEntryFromMerkleRoot(final String merkleRoot, final byte[] contentHash) {
-        if (merkleRoot.equals("0000000000000000000000000000000000000000000000000000000000000000")) {
-            return Optional.empty();
-        }
-
-        final var entryBlockResponseFactomResponse = entryBlockByKeyMerkleRoot(merkleRoot);
-
-        final var entryList = entryBlockResponseFactomResponse.getResult().getEntryList();
-        final var entryInList = findEntryInList(contentHash, entryList);
-
-        return entryInList
-                .or(() -> {
-                    final var previousKeyMR = entryBlockResponseFactomResponse.getResult().getHeader().getPreviousKeyMR();
-                    return getEntryFromMerkleRoot(previousKeyMR, contentHash);
+        final var entryVerification = getChainHead(chainId)
+                .thenCompose(chainHeadResponse -> {
+                    final var keyMerkleRoot = chainHeadResponse.getChainHead();
+                    return getEntryFromMerkleRoot(keyMerkleRoot, contentHash);
                 });
-    }
 
-    private FactomResponse<EntryBlockResponse> entryBlockByKeyMerkleRoot(final String merkleRoot) {
-        final FactomResponse<EntryBlockResponse> entryBlockResponseFactomResponse;
         try {
-            entryBlockResponseFactomResponse = this.factomdClient.entryBlockByKeyMerkleRoot(merkleRoot).get();
-
-            if (entryBlockResponseFactomResponse == null || 200 != entryBlockResponseFactomResponse.getHTTPResponseCode()) {
-                throw new FactomRuntimeException("Error retrieving response from Factom daemon on getting entry-block");
-            }
+            return entryVerification.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new FactomRuntimeException("Error retrieving response from Factom daemon on getting entry-block");
+            throw new FactomRuntimeException("Error retrieving response from Factom daemon on creating chain");
         }
-        return entryBlockResponseFactomResponse;
     }
 
-    private Optional<Entry> findEntryInList(final byte[] contentHash, final List<EntryBlockResponse.Entry> entryList) {
+    private CompletableFuture<ChainHeadResponse> getChainHead(String chainId) {
+        return this.factomdClient.chainHead(chainId)
+                .thenApply(this::validateFactomResponse);
+    }
+
+    private CompletableFuture<ComposeResponse> composeEntry(final Entry entry) {
+        return this.walletdClient.composeEntry(entry, this.entryCreditsAddress)
+                .thenApply(this::validateFactomResponse);
+    }
+
+    private CompletableFuture<CommitEntryResponse> commitEntry(ComposeResponse commitResult) {
+        return this.factomdClient.commitEntry(commitResult.getCommit().getParams().getMessage())
+                .thenApply(this::validateFactomResponse);
+    }
+
+    private CompletableFuture<RevealResponse> revealEntry(ComposeResponse commitResult) {
+        return this.factomdClient.revealEntry(commitResult.getReveal().getParams().getEntry())
+                .thenApply(this::validateFactomResponse);
+    }
+
+    private <T> T validateFactomResponse(FactomResponse<T> factomResponse) {
+        if (factomResponse == null || 200 != factomResponse.getHTTPResponseCode()) {
+            throw new FactomRuntimeException("Error retrieving response from Factom daemon");
+        }
+        return factomResponse.getResult();
+    }
+
+    private CompletableFuture<RevealResponse> revealChain(ComposeResponse.Reveal reveal) {
+        final String chainId = reveal.getParams().getEntry();
+        return this.factomdClient.revealChain(chainId)
+                .thenApply(this::validateFactomResponse);
+    }
+
+    private CompletableFuture<CommitChainResponse> commitChain(ComposeResponse.Commit commit) {
+        final var commitMessage = commit.getParams().getMessage();
+        return this.factomdClient.commitChain(commitMessage)
+                .thenApply(this::validateFactomResponse);
+    }
+
+    private CompletableFuture<ComposeResponse> composeChain(Chain chain) {
+        return this.walletdClient.composeChain(chain, this.entryCreditsAddress)
+                .thenApply(this::validateFactomResponse);
+    }
+
+    private CompletableFuture<Optional<Entry>> getEntryFromMerkleRoot(final String merkleRoot, final byte[] contentHash) {
+        if (merkleRoot.equals("0000000000000000000000000000000000000000000000000000000000000000")) {
+            return CompletableFuture.completedFuture(empty());
+        }
+
+        return entryBlockByKeyMerkleRoot(merkleRoot)
+                .thenCompose(entryBlockResponse -> findEntryInList(contentHash, entryBlockResponse.getEntryList())
+                        .thenCompose(entry -> {
+                            if (entry.isPresent()) {
+                                return CompletableFuture.completedFuture(entry);
+                            }
+
+                            final var previousKeyMR = entryBlockResponse.getHeader().getPreviousKeyMR();
+                            return getEntryFromMerkleRoot(previousKeyMR, contentHash);
+                        }));
+    }
+
+    private CompletableFuture<EntryBlockResponse> entryBlockByKeyMerkleRoot(final String merkleRoot) {
+        return this.factomdClient.entryBlockByKeyMerkleRoot(merkleRoot)
+                .thenApply(this::validateFactomResponse);
+    }
+
+    private CompletableFuture<Optional<Entry>> findEntryInList(final byte[] contentHash, final List<EntryBlockResponse.Entry> entryList) {
         final String contentInHex = Encoding.HEX.encode(contentHash);
-        return entryList.stream()
+
+        final var findEntries = new CompletableFuture<Optional<Entry>>();
+        entryList.stream()
                 .map(entry -> {
                     final var entryHash = entry.getEntryHash();
-                    try {
-                        final var entryResponseFactomResponse = this.factomdClient.entry(entryHash).get();
-                        return entryResponseFactomResponse.getResult();
-                    } catch (InterruptedException | ExecutionException e) {
-                        throw new IllegalArgumentException();
-                    }
+                    return getEntry(entryHash);
                 })
+                .map(CompletableFuture::join)
                 .filter(entry -> entry.getContent().equals(contentInHex))
+                .findFirst()
                 .map(entry -> {
                     final var bifEntry = new Entry();
                     bifEntry.setChainId(entry.getChainId());
@@ -186,6 +165,14 @@ public class FactomClient {
                     bifEntry.setExternalIds(entry.getExtIds());
                     return bifEntry;
                 })
-                .findFirst();
+                .map(Optional::of)
+                .ifPresentOrElse(findEntries::complete, () -> findEntries.complete(empty()));
+
+        return findEntries;
+    }
+
+    private CompletableFuture<EntryResponse> getEntry(final String entryHash) {
+        return this.factomdClient.entry(entryHash)
+                .thenApply(this::validateFactomResponse);
     }
 }

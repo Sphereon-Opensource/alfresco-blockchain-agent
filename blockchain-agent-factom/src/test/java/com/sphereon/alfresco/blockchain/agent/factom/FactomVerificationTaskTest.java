@@ -1,6 +1,7 @@
 package com.sphereon.alfresco.blockchain.agent.factom;
 
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
+import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,16 @@ public class FactomVerificationTaskTest {
     private FactomVerificationTask factomVerificationTask;
 
     @Test
-    public void verifyHash() {
+    public void verifyHashAtChainHead() {
         final var dummyHash = "Dummy-hash";
         final VerifyContentAlfrescoResponse verifyContentAlfrescoResponse = this.factomVerificationTask.verifyHash(dummyHash.getBytes());
-        assertEquals("fe07dab8c2917366f376b454736ac07865626074691b30ffddddda4ff02a9451", verifyContentAlfrescoResponse.getHash());
+        assertEquals(Encoding.HEX.encode("Dummy-hash".getBytes()), verifyContentAlfrescoResponse.getHash());
+    }
+
+    @Test
+    public void verifyHashInPreviousBlock() {
+        final var dummyHash = "Foo";
+        final VerifyContentAlfrescoResponse verifyContentAlfrescoResponse = this.factomVerificationTask.verifyHash(dummyHash.getBytes());
+        assertEquals(Encoding.HEX.encode("Foo".getBytes()), verifyContentAlfrescoResponse.getHash());
     }
 }
