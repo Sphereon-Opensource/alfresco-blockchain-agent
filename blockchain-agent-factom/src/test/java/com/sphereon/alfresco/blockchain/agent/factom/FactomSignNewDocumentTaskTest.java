@@ -14,6 +14,6 @@ public class FactomSignNewDocumentTaskTest {
 
     @Test
     public void testRegisterEntry() {
-        this.factomSignNewDocumentTask.registerHash("Dummy-hash-2".getBytes());
+        this.factomSignNewDocumentTask.registerHash("Dummy-hash-4".getBytes());
     }
 }

@@ -15,6 +15,7 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryR
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,8 @@ import static java.util.Optional.empty;
 
 @Component
 public class FactomClient {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FactomClient.class);
+
     private FactomdClient factomdClient;
     private WalletdClient walletdClient;
     private Address entryCreditsAddress;
@@ -42,6 +45,7 @@ public class FactomClient {
     public void postEntryToChain(final Entry entry) {
         final var postEntryToChain = composeEntry(entry)
                 .thenCompose(composedEntry -> commitEntry(composedEntry)
+                        .handle(this::handleCommitEntry)
                         .thenCompose(commitEntry -> revealEntry(composedEntry)));
 
         try {
@@ -51,12 +55,20 @@ public class FactomClient {
         }
     }
 
+    private <T> T handleCommitEntry(T commitResponse, Throwable throwable) {
+        if (throwable != null) {
+            logger.error("Commit entry failed. Will try reveal next.", throwable);
+        }
+        return null;
+    }
+
     public RevealResponse createChainFromEntry(Entry entry) {
         final var chain = new Chain();
         chain.setFirstEntry(entry);
 
         final CompletableFuture<RevealResponse> createChain = composeChain(chain)
                 .thenCompose(composeResponse -> commitChain(composeResponse.getCommit())
+                        .handle(this::handleCommitEntry)
                         .thenCompose(commitResult -> revealChain(composeResponse.getReveal())));
 
         try {

@@ -18,9 +18,9 @@ public class FactomVerificationTaskTest {
 
     @Test
     public void verifyHashAtChainHead() {
-        final var dummyHash = "Dummy-hash";
+        final var dummyHash = "Dummy-hash-4";
         final VerifyContentAlfrescoResponse verifyContentAlfrescoResponse = this.factomVerificationTask.verifyHash(dummyHash.getBytes());
-        assertEquals(Encoding.HEX.encode("Dummy-hash".getBytes()), verifyContentAlfrescoResponse.getHash());
+        assertEquals(Encoding.HEX.encode("Dummy-hash-4".getBytes()), verifyContentAlfrescoResponse.getHash());
     }
 
     @Test
