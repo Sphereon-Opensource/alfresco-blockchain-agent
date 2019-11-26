@@ -5,6 +5,7 @@ import com.alfresco.apis.model.NodeEntry;
 import com.google.common.base.Charsets;
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
+import com.sphereon.alfresco.blockchain.agent.utils.Hasher;
 import com.sphereon.libs.blockchain.commons.Digest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -56,8 +57,9 @@ public class VerifyRegistrations {
                     })
                     .forEach(entry -> {
                         logger.info("Found document " + entry.getName() + " / " + entry.getId());
-                        final var contentHash = alfrescoRepository.hashEntry(entry.getId(), hashAlgorithm);
-                        final var response = verificationTask.verify(contentHash);
+                        final var content = alfrescoRepository.getEntry(entry.getId());
+                        final var contentHash = Hasher.hash(content, hashAlgorithm);
+                        final var response = verificationTask.verifyHash(contentHash);
                         final var registrationState = response.getRegistrationState();
                         final var registrationTime = response.getRegistrationTime();
                         final var singleProofChainChainId = response.getSingleProofChainId();

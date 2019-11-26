@@ -3,6 +3,7 @@ package com.sphereon.alfresco.blockchain.agent.tasks.scheduled;
 import com.alfresco.apis.handler.ApiException;
 import com.alfresco.apis.model.ResultNode;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
+import com.sphereon.alfresco.blockchain.agent.utils.Hasher;
 import com.sphereon.libs.blockchain.commons.Digest;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -36,7 +37,8 @@ public class VerifyPendingRegistrations {
             this.alfrescoRepository.selectAlfrescoNodes(PENDING_VERIFICATION).forEach(rowEntry -> {
                 ResultNode entry = rowEntry.getEntry();
                 logger.info("Found document " + entry.getName() + " / " + entry.getId());
-                var contentHash = this.alfrescoRepository.hashEntry(entry.getId(), hashAlgorithm);
+                final var content = this.alfrescoRepository.getEntry(entry.getId());
+                final var contentHash = Hasher.hash(content, hashAlgorithm);
                 final var verifyResponse = this.pendingRegistrationsTask.verifyHash(contentHash);
                 if (verifyResponse.getRegistrationState() == REGISTERED) {
                     final var registrationState = verifyResponse.getRegistrationState();

@@ -5,6 +5,7 @@ import com.alfresco.apis.model.NodeEntry;
 import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
+import com.sphereon.alfresco.blockchain.agent.utils.Hasher;
 import com.sphereon.libs.blockchain.commons.Digest;
 import org.junit.Before;
 import org.junit.Test;
@@ -73,17 +74,18 @@ public class VerifyRegistrationsTest {
                 .thenReturn(alfrescoNodes);
 
         for (var id : asList("2", "3", "4")) {
-            final byte[] hash = ("dummy-hash-" + id).getBytes();
-            when(alfrescoRepositoryMock.hashEntry(eq(id), eq(hashAlgorithm)))
-                    .thenReturn(hash);
+            final byte[] content = ("dummy-content-" + id).getBytes();
+            final byte[] contentHash = Hasher.hash(content, Digest.Algorithm.SHA_256);
+
+            when(alfrescoRepositoryMock.getEntry(eq(id)))
+                    .thenReturn(content);
 
             final var response = new VerifyContentAlfrescoResponse();
             response.setRegistrationState(REGISTERED);
             response.setRegistrationTime(OffsetDateTime.now(dummyClock));
-            when(verificationTask.verify(eq(hash)))
+            when(verificationTask.verifyHash(eq(contentHash)))
                     .thenReturn(response);
         }
-
 
         final var result = this.verification.execute(nodeIds, "");
         assertThat(result.size()).isEqualTo(3);
@@ -91,7 +93,7 @@ public class VerifyRegistrationsTest {
         assertThat(result.get(0).getRegistrationTime()).isEqualTo(OffsetDateTime.now(dummyClock));
 
         verify(alfrescoRepositoryMock).selectAlfrescoNodes(eq(nodeIds));
-        verify(alfrescoRepositoryMock, times(3)).hashEntry(anyString(), eq(hashAlgorithm));
+        verify(alfrescoRepositoryMock, times(3)).getEntry(anyString());
 
         verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("2", REGISTERED, OffsetDateTime.now(dummyClock), null, null);
         verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("3", REGISTERED, OffsetDateTime.now(dummyClock), null, null);
@@ -99,7 +101,7 @@ public class VerifyRegistrationsTest {
 
         verifyNoMoreInteractions(alfrescoRepositoryMock);
 
-        verify(verificationTask, times(3)).verify(any());
+        verify(verificationTask, times(3)).verifyHash(any());
         verifyNoMoreInteractions(verificationTask);
     }
 
@@ -118,14 +120,16 @@ public class VerifyRegistrationsTest {
                 .thenReturn(alfrescoNodes);
 
         for (var id : asList("2", "3")) {
-            final byte[] hash = ("dummy-hash-" + id).getBytes();
-            when(alfrescoRepositoryMock.hashEntry(eq(id), eq(hashAlgorithm)))
-                    .thenReturn(hash);
+            final byte[] content = ("dummy-content-" + id).getBytes();
+            final byte[] contentHash = Hasher.hash(content, Digest.Algorithm.SHA_256);
+
+            when(alfrescoRepositoryMock.getEntry(eq(id)))
+                    .thenReturn(content);
 
             final var response = new VerifyContentAlfrescoResponse();
             response.setRegistrationState(REGISTERED);
             response.setRegistrationTime(OffsetDateTime.now(dummyClock));
-            when(verificationTask.verify(eq(hash)))
+            when(verificationTask.verifyHash(eq(contentHash)))
                     .thenReturn(response);
         }
 
@@ -139,14 +143,14 @@ public class VerifyRegistrationsTest {
         assertThat(result.get(0).getRegistrationTime()).isEqualTo(OffsetDateTime.now(dummyClock));
 
         verify(alfrescoRepositoryMock).selectAlfrescoNodes(eq(nodeIds));
-        verify(alfrescoRepositoryMock, times(2)).hashEntry(anyString(), eq(hashAlgorithm));
+        verify(alfrescoRepositoryMock, times(2)).getEntry(anyString());
 
         verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("2", REGISTERED, OffsetDateTime.now(dummyClock), null, null);
         verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("3", REGISTERED, OffsetDateTime.now(dummyClock), null, null);
 
         verifyNoMoreInteractions(alfrescoRepositoryMock);
 
-        verify(verificationTask, times(2)).verify(any());
+        verify(verificationTask, times(2)).verifyHash(any());
         verifyNoMoreInteractions(verificationTask);
     }
 

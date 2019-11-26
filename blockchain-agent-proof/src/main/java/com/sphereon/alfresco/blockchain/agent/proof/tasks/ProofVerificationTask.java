@@ -17,8 +17,8 @@ public class ProofVerificationTask implements VerifyRegistrationTask {
     private final VerificationApi bcProofVerificationApi;
     private final TokenRequest tokenRequester;
     private final Signer signer;
-    private String proofApiConfigName;
-    private ProofApiUtils utils;
+    private final String proofApiConfigName;
+    private final ProofApiUtils utils;
 
     public ProofVerificationTask(final VerificationApi bcProofVerificationApi,
                                  final TokenRequest tokenRequester,
@@ -33,11 +33,11 @@ public class ProofVerificationTask implements VerifyRegistrationTask {
     }
 
     @Override
-    public VerifyContentAlfrescoResponse verify(final byte[] contentHash) {
-        return this.utils.toAlfrescoResponse(verifyHash(contentHash));
+    public VerifyContentAlfrescoResponse verifyHash(final byte[] contentHash) {
+        return this.utils.toAlfrescoResponse(verify(contentHash));
     }
 
-    private VerifyContentResponse verifyHash(final byte[] contentHash) {
+    private VerifyContentResponse verify(final byte[] contentHash) {
         final var contentRequest = new ContentRequest();
         contentRequest.setContent(contentHash);
         contentRequest.setHashProvider(ContentRequest.HashProviderEnum.CLIENT);

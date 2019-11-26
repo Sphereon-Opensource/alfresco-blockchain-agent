@@ -2,6 +2,7 @@ package com.sphereon.alfresco.blockchain.agent.tasks.scheduled;
 
 import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
+import com.sphereon.alfresco.blockchain.agent.utils.Hasher;
 import com.sphereon.libs.blockchain.commons.Digest;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,7 +18,7 @@ public class SignNewDocuments {
 
     private final AlfrescoRepository alfrescoRepository;
     private final SignNewDocumentsTask signNewDocumentsTask;
-    private final Digest.Algorithm hashAlgorithm;
+    private Digest.Algorithm hashAlgorithm;
 
     public SignNewDocuments(final AlfrescoRepository alfrescoRepository,
                             final SignNewDocumentsTask signNewDocumentsTask,
@@ -36,8 +37,9 @@ public class SignNewDocuments {
                         final var entry = rowEntry.getEntry();
                         try {
                             logger.info("Found document " + entry.getName() + " / " + entry.getId());
-                            final var contentHash = this.alfrescoRepository.hashEntry(entry.getId(), hashAlgorithm);
-                            this.signNewDocumentsTask.registerEntry(contentHash, hashAlgorithm);
+                            final var content = this.alfrescoRepository.getEntry(entry.getId());
+                            final var contentHash = Hasher.hash(content, hashAlgorithm);
+                            this.signNewDocumentsTask.registerHash(contentHash);
                             final var registrationState = AlfrescoBlockchainRegistrationState.PENDING_VERIFICATION;
                             logger.info("Updating state to {} for document {} / {}", registrationState, entry.getName(), entry.getId());
                             this.alfrescoRepository.updateAlfrescoNodeWith(entry.getId(), registrationState);

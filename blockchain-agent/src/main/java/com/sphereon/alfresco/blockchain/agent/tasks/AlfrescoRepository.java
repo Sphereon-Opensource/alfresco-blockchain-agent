@@ -15,7 +15,6 @@ import com.alfresco.apis.model.ResultSetRowEntry;
 import com.alfresco.apis.model.SearchRequest;
 import com.google.common.collect.ImmutableMap;
 import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
-import com.sphereon.libs.blockchain.commons.Digest;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -93,14 +92,14 @@ public class AlfrescoRepository {
         return nodeEntries;
     }
 
-    public byte[] hashEntry(final String alfrescoNodeId, Digest.Algorithm hashAlgorithm) {
+    public byte[] getEntry(final String alfrescoNodeId) {
         final String[] localVarAuthNames = new String[]{"basicAuth"};
         try {
             var call = cmisApiClient.buildCall("/content", "GET", List.of(new Pair("id", alfrescoNodeId)), null,
                     new HashMap<>(), null, localVarAuthNames, null);
             var response = call.execute();
             if (response.code() == 200) {
-                return Digest.getInstance().getHashAsHex(hashAlgorithm, response.body().byteStream());
+                return response.body().byteStream().readAllBytes();
             }
             throw new RuntimeException("Content request returned http code " + response.code());
         } catch (ApiException e) {

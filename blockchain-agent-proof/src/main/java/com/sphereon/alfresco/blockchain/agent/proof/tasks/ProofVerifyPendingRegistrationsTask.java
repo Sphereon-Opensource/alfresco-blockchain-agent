@@ -15,7 +15,7 @@ public class ProofVerifyPendingRegistrationsTask implements VerifyPendingRegistr
     private final VerificationApi bcProofVerificationApi;
     private final TokenRequest tokenRequester;
     private final ProofApiUtils utils;
-    private Signer signer;
+    private final Signer signer;
     private final String proofApiConfigName;
 
     public ProofVerifyPendingRegistrationsTask(final VerificationApi bcProofVerificationApi,
@@ -31,7 +31,7 @@ public class ProofVerifyPendingRegistrationsTask implements VerifyPendingRegistr
     }
 
     @Override
-    public VerifyContentAlfrescoResponse verifyHash(byte[] contentHash) {
+    public VerifyContentAlfrescoResponse verifyHash(final byte[] contentHash) {
         tokenRequester.execute();
         var contentRequest = new ContentRequest();
         contentRequest.setContent(contentHash);
