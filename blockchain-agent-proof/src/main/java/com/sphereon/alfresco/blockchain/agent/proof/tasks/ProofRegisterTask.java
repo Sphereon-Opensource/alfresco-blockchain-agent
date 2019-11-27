@@ -33,13 +33,13 @@ public class ProofRegisterTask implements RegisterTask {
 
     @Override
     public void registerHash(byte[] contentHash) {
-        tokenRequester.execute();
         var contentRequest = new ContentRequest();
         contentRequest.setContent(contentHash);
         contentRequest.setHashProvider(ContentRequest.HashProviderEnum.CLIENT);
         try {
             final var signature = signer.sign(contentHash);
             logger.info("Registering content " + new String(contentHash, Charsets.UTF_8));
+            tokenRequester.execute();
             final var registerContentResponse = bcProofRegistrationApi.registerUsingContent(proofApiConfigName, contentRequest, null, null, signature, null);
             logger.info("registerContentResponse: " + registerContentResponse);
         } catch (com.sphereon.sdk.blockchain.proof.handler.ApiException e) {

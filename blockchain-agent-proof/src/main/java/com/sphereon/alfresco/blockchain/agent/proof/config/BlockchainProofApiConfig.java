@@ -86,7 +86,7 @@ public class BlockchainProofApiConfig {
         apiClient.setConnectTimeout(connectionTimeout);
         apiClient.getHttpClient().setWriteTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
         apiClient.getHttpClient().setReadTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
-        apiClient.setAccessToken(tokenRequester.execute().getAccessToken());
+
         tokenRequester.addTokenResponseListener(new TokenRequest.TokenResponseListener() {
             @Override
             public void tokenResponse(TokenResponse tokenResponse) {
@@ -98,5 +98,7 @@ public class BlockchainProofApiConfig {
                 logger.error("An error occurred whilst renewing token for the blockchain verification API", throwable);
             }
         });
+
+        tokenRequester.execute().getAccessToken();
     }
 }
