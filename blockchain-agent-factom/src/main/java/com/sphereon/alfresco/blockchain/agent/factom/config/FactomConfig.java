@@ -1,5 +1,6 @@
 package com.sphereon.alfresco.blockchain.agent.factom.config;
 
+import com.google.common.collect.ImmutableList;
 import com.sphereon.alfresco.blockchain.agent.factom.FactomClient;
 import com.sphereon.libs.blockchain.commons.Digest;
 import org.blockchain_innovation.factom.client.api.FactomdClient;
@@ -17,12 +18,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
+import java.util.List;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.function.BiConsumer;
 
 import static com.sphereon.alfresco.blockchain.agent.factom.config.ExternalIds.HASH_TYPE;
-import static java.util.Arrays.asList;
 
 @Configuration
 public class FactomConfig {
@@ -58,22 +58,38 @@ public class FactomConfig {
     @Bean
     public String factomChainId(final FactomClient factomClient,
                                 @Value("${sphereon.blockchain.agent.factom.chain.id:#{null}}") final String configuredChainId,
-                                @Value("${sphereon.blockchain.agent.factom.chain.create:false}") final boolean shouldCreateChain,
+                                @Value("${sphereon.blockchain.agent.factom.chain.names:#{java.util.Collections.emptyList()}}") final List<String> configuredChainNames,
                                 final Digest.Algorithm hashAlgorithm) {
-        if (configuredChainId != null && !configuredChainId.isEmpty()) {
+        final boolean isChainIdConfigured = configuredChainId != null && !configuredChainId.isEmpty();
+        final boolean isChainNamesConfigured = configuredChainNames != null && !configuredChainNames.isEmpty();
+
+        if (isChainIdConfigured && isChainNamesConfigured) {
+            throw new IllegalStateException("Both chain ID and chain names configured, expected only one property");
+        }
+
+        if (isChainIdConfigured) {
             return configuredChainId;
         }
 
-        if (!shouldCreateChain) {
-            throw new IllegalStateException("Configuration did not specify a chain ID or to create a new chain");
-        }
-
         final var entry = new Entry();
-        entry.setContent(UUID.randomUUID().toString());
-        entry.setExternalIds(asList(HASH_TYPE, hashAlgorithm.getImplementation()));
+        entry.setContent("");
+        entry.setExternalIds(externalIdsFromNames(hashAlgorithm, configuredChainNames));
         final var chainId = factomClient.createChainFromEntry(entry).getChainId();
         logger.info("Created chain " + chainId);
         return chainId;
+    }
+
+    private List<String> externalIdsFromNames(final Digest.Algorithm hashAlgorithm, final List<String> configuredChainNames) {
+        final ImmutableList.Builder<String> externalIdsBuilder = ImmutableList.<String>builder()
+                .add(HASH_TYPE)
+                .add(hashAlgorithm.getImplementation());
+
+        configuredChainNames.forEach(chainName -> {
+            externalIdsBuilder.add(ExternalIds.CHAIN_NAME);
+            externalIdsBuilder.add(chainName);
+        });
+
+        return externalIdsBuilder.build();
     }
 
     private RpcSettings factomDSettingsFrom(final String url,

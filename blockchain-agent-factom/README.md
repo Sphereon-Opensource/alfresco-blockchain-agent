@@ -15,16 +15,20 @@ sphereon.blockchain.agent.factom.walletd.username=foo
 sphereon.blockchain.agent.factom.walletd.password=bar
 ```
 
+## Chains
+
+Proof of existence will be written to a single chain. A fixed chain ID can be set, or a chain can be created deterministically.
+
 ## Configuration
 Configure an entry credits address that the local wallet has access to:
 ```
 sphereon.blockchain.agent.factom.entry-credits.address=EC2uddT5TUToHGU34tp7fdhZagGwH5w2fFnpQ3GNNfUjeb7X18kF
 ```
 
-Configure either a chain ID, or enable chain-creation:
+Configure either a chain ID, or supply chain names from which a chain will deterministically be created:
 ```
 sphereon.blockchain.agent.factom.chain.id=fe07dab8c2917366f376b454736ac07865626074691b30ffddddda4ff02a9451
-sphereon.blockchain.agent.factom.chain.create=true
+sphereon.blockchain.agent.factom.chain.names=sphereon-alfresco,demo
 ```
 If a chain ID is specified, the create property will be ignored.
 
