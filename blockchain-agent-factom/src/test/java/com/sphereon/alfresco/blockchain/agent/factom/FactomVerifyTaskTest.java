@@ -12,21 +12,21 @@ import static org.junit.Assert.assertEquals;
 
 @SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
-public class FactomVerificationTaskTest {
+public class FactomVerifyTaskTest {
     @Autowired
-    private FactomVerificationTask factomVerificationTask;
+    private FactomVerifyTask factomVerifyTask;
 
     @Test
     public void verifyHashAtChainHead() {
         final var dummyHash = "Dummy-hash-4";
-        final VerifyContentAlfrescoResponse verifyContentAlfrescoResponse = this.factomVerificationTask.verifyHash(dummyHash.getBytes());
+        final VerifyContentAlfrescoResponse verifyContentAlfrescoResponse = this.factomVerifyTask.verifyHash(dummyHash.getBytes());
         assertEquals(Encoding.HEX.encode("Dummy-hash-4".getBytes()), verifyContentAlfrescoResponse.getHash());
     }
 
     @Test
     public void verifyHashInPreviousBlock() {
         final var dummyHash = "Foo";
-        final VerifyContentAlfrescoResponse verifyContentAlfrescoResponse = this.factomVerificationTask.verifyHash(dummyHash.getBytes());
+        final VerifyContentAlfrescoResponse verifyContentAlfrescoResponse = this.factomVerifyTask.verifyHash(dummyHash.getBytes());
         assertEquals(Encoding.HEX.encode("Foo".getBytes()), verifyContentAlfrescoResponse.getHash());
     }
 }

@@ -1,7 +1,7 @@
 package com.sphereon.alfresco.blockchain.agent.proof.tasks;
 
 import com.google.common.base.Charsets;
-import com.sphereon.alfresco.blockchain.agent.tasks.scheduled.SignNewDocumentsTask;
+import com.sphereon.alfresco.blockchain.agent.tasks.RegisterTask;
 import com.sphereon.alfresco.blockchain.agent.utils.Signer;
 import com.sphereon.libs.authentication.api.TokenRequest;
 import com.sphereon.sdk.blockchain.proof.api.RegistrationApi;
@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProofSignNewDocumentTask implements SignNewDocumentsTask {
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProofSignNewDocumentTask.class);
+public class ProofRegisterTask implements RegisterTask {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProofRegisterTask.class);
 
     private static final String EXCEPTION_MESSAGE_ERROR_REGISTER = "An error occurred whilst registering content: %d\n%s";
 
@@ -21,10 +21,10 @@ public class ProofSignNewDocumentTask implements SignNewDocumentsTask {
     private final Signer signer;
     private final String proofApiConfigName;
 
-    public ProofSignNewDocumentTask(final RegistrationApi bcProofRegistrationApi,
-                                    final TokenRequest tokenRequester,
-                                    final Signer signer,
-                                    @Value("${blockchain.config-name:#{null}}") final String proofApiConfigName) {
+    public ProofRegisterTask(final RegistrationApi bcProofRegistrationApi,
+                             final TokenRequest tokenRequester,
+                             final Signer signer,
+                             @Value("${blockchain.config-name:#{null}}") final String proofApiConfigName) {
         this.bcProofRegistrationApi = bcProofRegistrationApi;
         this.tokenRequester = tokenRequester;
         this.signer = signer;

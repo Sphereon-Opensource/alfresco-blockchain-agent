@@ -5,6 +5,7 @@ import com.alfresco.apis.model.NodeEntry;
 import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
+import com.sphereon.alfresco.blockchain.agent.tasks.VerifyTask;
 import com.sphereon.alfresco.blockchain.agent.utils.Hasher;
 import com.sphereon.libs.blockchain.commons.Digest;
 import org.junit.Before;
@@ -36,7 +37,7 @@ import static org.mockito.Mockito.when;
 public class VerifyRegistrationsTest {
     private VerifyRegistrations verification;
     private AlfrescoRepository alfrescoRepositoryMock;
-    private VerifyRegistrationTask verificationTask;
+    private VerifyTask verificationTask;
     private Clock dummyClock;
     private Digest.Algorithm hashAlgorithm;
 
@@ -46,7 +47,7 @@ public class VerifyRegistrationsTest {
 
         this.alfrescoRepositoryMock = mock(AlfrescoRepository.class);
         final ObjectFactory<AlfrescoRepository> factory = () -> alfrescoRepositoryMock;
-        this.verificationTask = mock(VerifyRegistrationTask.class);
+        this.verificationTask = mock(VerifyTask.class);
 
         this.hashAlgorithm = Digest.Algorithm.SHA_256;
         this.verification = new VerifyRegistrations(factory, verificationTask, hashAlgorithm);

@@ -2,6 +2,7 @@ package com.sphereon.alfresco.blockchain.agent.tasks.scheduled;
 
 import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
+import com.sphereon.alfresco.blockchain.agent.tasks.RegisterTask;
 import com.sphereon.alfresco.blockchain.agent.utils.Hasher;
 import com.sphereon.libs.blockchain.commons.Digest;
 import org.slf4j.LoggerFactory;
@@ -17,14 +18,14 @@ public class SignNewDocuments {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SignNewDocuments.class);
 
     private final AlfrescoRepository alfrescoRepository;
-    private final SignNewDocumentsTask signNewDocumentsTask;
+    private final RegisterTask registerTask;
     private Digest.Algorithm hashAlgorithm;
 
     public SignNewDocuments(final AlfrescoRepository alfrescoRepository,
-                            final SignNewDocumentsTask signNewDocumentsTask,
+                            final RegisterTask registerTask,
                             final Digest.Algorithm hashAlgorithm) {
         this.alfrescoRepository = alfrescoRepository;
-        this.signNewDocumentsTask = signNewDocumentsTask;
+        this.registerTask = registerTask;
         this.hashAlgorithm = hashAlgorithm;
     }
 
@@ -39,7 +40,7 @@ public class SignNewDocuments {
                             logger.info("Found document " + entry.getName() + " / " + entry.getId());
                             final var content = this.alfrescoRepository.getEntry(entry.getId());
                             final var contentHash = Hasher.hash(content, hashAlgorithm);
-                            this.signNewDocumentsTask.registerHash(contentHash);
+                            this.registerTask.registerHash(contentHash);
                             final var registrationState = AlfrescoBlockchainRegistrationState.PENDING_VERIFICATION;
                             logger.info("Updating state to {} for document {} / {}", registrationState, entry.getName(), entry.getId());
                             this.alfrescoRepository.updateAlfrescoNodeWith(entry.getId(), registrationState);

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 
 import static java.util.Optional.empty;
@@ -50,8 +51,8 @@ public class FactomClient {
 
         try {
             postEntryToChain.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new FactomRuntimeException("Error retrieving response from Factom daemon");
+        } catch (CompletionException | InterruptedException | ExecutionException e) {
+            throw new FactomRuntimeException("Error retrieving response from Factom daemon", e);
         }
     }
 
@@ -74,7 +75,7 @@ public class FactomClient {
         try {
             return createChain.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new FactomRuntimeException("Error retrieving response from Factom daemon on creating chain");
+            throw new FactomRuntimeException("Error retrieving response from Factom daemon on creating chain", e);
         }
     }
 
@@ -88,7 +89,7 @@ public class FactomClient {
         try {
             return entryVerification.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new FactomRuntimeException("Error retrieving response from Factom daemon on creating chain");
+            throw new FactomRuntimeException("Error retrieving response from Factom daemon on creating chain", e);
         }
     }
 
@@ -107,8 +108,8 @@ public class FactomClient {
                 .thenApply(this::validateFactomResponse);
     }
 
-    private CompletableFuture<RevealResponse> revealEntry(ComposeResponse commitResult) {
-        return this.factomdClient.revealEntry(commitResult.getReveal().getParams().getEntry())
+    private CompletableFuture<RevealResponse> revealEntry(ComposeResponse composeResult) {
+        return this.factomdClient.revealEntry(composeResult.getReveal().getParams().getEntry())
                 .thenApply(this::validateFactomResponse);
     }
 

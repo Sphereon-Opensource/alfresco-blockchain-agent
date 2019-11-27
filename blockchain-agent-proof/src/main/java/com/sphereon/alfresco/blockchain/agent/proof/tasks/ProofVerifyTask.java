@@ -2,7 +2,7 @@ package com.sphereon.alfresco.blockchain.agent.proof.tasks;
 
 import com.sphereon.alfresco.blockchain.agent.proof.ProofApiUtils;
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
-import com.sphereon.alfresco.blockchain.agent.tasks.ondemand.VerifyRegistrationTask;
+import com.sphereon.alfresco.blockchain.agent.tasks.VerifyTask;
 import com.sphereon.alfresco.blockchain.agent.utils.Signer;
 import com.sphereon.libs.authentication.api.TokenRequest;
 import com.sphereon.sdk.blockchain.proof.api.VerificationApi;
@@ -13,18 +13,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProofVerificationTask implements VerifyRegistrationTask {
+public class ProofVerifyTask implements VerifyTask {
     private final VerificationApi bcProofVerificationApi;
     private final TokenRequest tokenRequester;
     private final Signer signer;
     private final String proofApiConfigName;
     private final ProofApiUtils utils;
 
-    public ProofVerificationTask(final VerificationApi bcProofVerificationApi,
-                                 final TokenRequest tokenRequester,
-                                 final Signer signer,
-                                 final ProofApiUtils utils,
-                                 @Value("${blockchain.config-name:#{null}}") final String proofApiConfigName) {
+    public ProofVerifyTask(final VerificationApi bcProofVerificationApi,
+                           final TokenRequest tokenRequester,
+                           final Signer signer,
+                           final ProofApiUtils utils,
+                           @Value("${blockchain.config-name:#{null}}") final String proofApiConfigName) {
         this.bcProofVerificationApi = bcProofVerificationApi;
         this.tokenRequester = tokenRequester;
         this.signer = signer;

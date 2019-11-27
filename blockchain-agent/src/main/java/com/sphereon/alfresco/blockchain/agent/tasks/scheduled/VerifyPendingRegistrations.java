@@ -3,6 +3,7 @@ package com.sphereon.alfresco.blockchain.agent.tasks.scheduled;
 import com.alfresco.apis.handler.ApiException;
 import com.alfresco.apis.model.ResultNode;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
+import com.sphereon.alfresco.blockchain.agent.tasks.VerifyTask;
 import com.sphereon.alfresco.blockchain.agent.utils.Hasher;
 import com.sphereon.libs.blockchain.commons.Digest;
 import org.slf4j.LoggerFactory;
@@ -19,14 +20,14 @@ public class VerifyPendingRegistrations {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(VerifyPendingRegistrations.class);
 
     private final AlfrescoRepository alfrescoRepository;
-    private final VerifyPendingRegistrationsTask pendingRegistrationsTask;
+    private final VerifyTask verifyTask;
     private final Digest.Algorithm hashAlgorithm;
 
     public VerifyPendingRegistrations(final AlfrescoRepository alfrescoRepository,
-                                      final VerifyPendingRegistrationsTask pendingRegistrationsTask,
+                                      final VerifyTask verifyTask,
                                       final Digest.Algorithm hashAlgorithm) {
         this.alfrescoRepository = alfrescoRepository;
-        this.pendingRegistrationsTask = pendingRegistrationsTask;
+        this.verifyTask = verifyTask;
         this.hashAlgorithm = hashAlgorithm;
     }
 
@@ -39,7 +40,7 @@ public class VerifyPendingRegistrations {
                 logger.info("Found document " + entry.getName() + " / " + entry.getId());
                 final var content = this.alfrescoRepository.getEntry(entry.getId());
                 final var contentHash = Hasher.hash(content, hashAlgorithm);
-                final var verifyResponse = this.pendingRegistrationsTask.verifyHash(contentHash);
+                final var verifyResponse = this.verifyTask.verifyHash(contentHash);
                 if (verifyResponse.getRegistrationState() == REGISTERED) {
                     final var registrationState = verifyResponse.getRegistrationState();
                     final var singleProofChainChainId = verifyResponse.getSingleProofChainId();

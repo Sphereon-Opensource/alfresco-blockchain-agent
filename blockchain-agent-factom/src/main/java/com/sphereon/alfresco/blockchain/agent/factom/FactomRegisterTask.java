@@ -1,25 +1,21 @@
 package com.sphereon.alfresco.blockchain.agent.factom;
 
 import com.sphereon.alfresco.blockchain.agent.factom.config.ExternalIds;
-import com.sphereon.alfresco.blockchain.agent.tasks.scheduled.SignNewDocumentsTask;
-import com.sphereon.libs.blockchain.commons.Digest;
+import com.sphereon.alfresco.blockchain.agent.tasks.RegisterTask;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FactomSignNewDocumentTask implements SignNewDocumentsTask {
+public class FactomRegisterTask implements RegisterTask {
     private final FactomClient factomClient;
     private final String chainId;
-    private final Digest.Algorithm hashAlgorithm;
 
-    public FactomSignNewDocumentTask(final FactomClient factomClient,
-                                     @Qualifier("factomChainId") final String chainId,
-                                     final Digest.Algorithm hashAlgorithm) {
+    public FactomRegisterTask(final FactomClient factomClient,
+                              @Qualifier("factomChainId") final String chainId) {
         this.factomClient = factomClient;
         this.chainId = chainId;
-        this.hashAlgorithm = hashAlgorithm;
     }
 
     @Override

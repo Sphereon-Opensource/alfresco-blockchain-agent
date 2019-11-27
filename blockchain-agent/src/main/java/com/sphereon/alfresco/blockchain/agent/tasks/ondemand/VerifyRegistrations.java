@@ -5,6 +5,7 @@ import com.alfresco.apis.model.NodeEntry;
 import com.google.common.base.Charsets;
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
+import com.sphereon.alfresco.blockchain.agent.tasks.VerifyTask;
 import com.sphereon.alfresco.blockchain.agent.utils.Hasher;
 import com.sphereon.libs.blockchain.commons.Digest;
 import org.apache.commons.codec.binary.Base64;
@@ -30,11 +31,11 @@ public class VerifyRegistrations {
     private static final Logger logger = LoggerFactory.getLogger(VerifyRegistrations.class);
 
     private final ObjectFactory<AlfrescoRepository> alfrescoRepositoryFactory;
-    private final VerifyRegistrationTask verificationTask;
+    private final VerifyTask verificationTask;
     private final Digest.Algorithm hashAlgorithm;
 
     public VerifyRegistrations(final ObjectFactory<AlfrescoRepository> alfrescoRepositoryFactory,
-                               final VerifyRegistrationTask verificationTask,
+                               final VerifyTask verificationTask,
                                final Digest.Algorithm hashAlgorithm) {
         this.alfrescoRepositoryFactory = alfrescoRepositoryFactory;
         this.verificationTask = verificationTask;

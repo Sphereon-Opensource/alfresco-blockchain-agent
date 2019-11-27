@@ -4,12 +4,12 @@ The defaults for Factom-java-client are used if no configuration is specified, w
 
 The defaults can be overwritten:
 ```
-sphereon.blockchain.agent.factom.factomd.url=localhost:8088
+sphereon.blockchain.agent.factom.factomd.url=http://localhost:8088/v2
 sphereon.blockchain.agent.factom.factomd.timeout=1000
 sphereon.blockchain.agent.factom.factomd.username=foo
 sphereon.blockchain.agent.factom.factomd.password=bar
 
-sphereon.blockchain.agent.factom.walletd.url=localhost:8089
+sphereon.blockchain.agent.factom.walletd.url=http://localhost:8089/v2
 sphereon.blockchain.agent.factom.walletd.timeout=1000
 sphereon.blockchain.agent.factom.walletd.username=foo
 sphereon.blockchain.agent.factom.walletd.password=bar
