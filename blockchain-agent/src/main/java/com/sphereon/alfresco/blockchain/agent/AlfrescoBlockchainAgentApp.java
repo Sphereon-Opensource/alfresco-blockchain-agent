@@ -8,7 +8,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @EnableSwagger2
-@EnableScheduling
 @ComponentScan(basePackages = {"com.sphereon.alfresco.blockchain.agent", "com.sphereon.libs"})
 public class AlfrescoBlockchainAgentApp {
     public static void main(String[] args) {

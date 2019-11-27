@@ -10,10 +10,12 @@ import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings;
 import org.blockchain_innovation.factom.client.api.settings.RpcSettings.SubSystem;
 import org.blockchain_innovation.factom.client.impl.FactomdClientImpl;
+import org.blockchain_innovation.factom.client.impl.OfflineWalletdClientImpl;
 import org.blockchain_innovation.factom.client.impl.WalletdClientImpl;
 import org.blockchain_innovation.factom.client.impl.settings.RpcSettingsImpl;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -40,14 +42,22 @@ public class FactomConfig {
     }
 
     @Bean
+    @ConditionalOnExpression("#{T(org.blockchain_innovation.factom.client.api.model.types.AddressType).ENTRY_CREDIT_PUBLIC.isValid('${sphereon.blockchain.agent.factom.entry-credits.address}')}")
     @Scope("prototype")
-    public WalletdClient walletdClient(@Value("${sphereon.blockchain.agent.factom.walletd.url:#{null}}") final String url,
+    public WalletdClient walletDClient(@Value("${sphereon.blockchain.agent.factom.walletd.url:#{null}}") final String url,
                                        @Value("${sphereon.blockchain.agent.factom.walletd.timeout:#{null}}") final String timeout,
                                        @Value("${sphereon.blockchain.agent.factom.walletd.username:#{null}}") final String username,
                                        @Value("${sphereon.blockchain.agent.factom.walletd.password:#{null}}") final String password) {
         final var walletdClient = new WalletdClientImpl();
         walletdClient.setSettings(walletDSettingsFrom(url, timeout, username, password));
         return walletdClient;
+    }
+
+    @Bean
+    @ConditionalOnExpression("#{T(org.blockchain_innovation.factom.client.api.model.types.AddressType).ENTRY_CREDIT_SECRET.isValid('${sphereon.blockchain.agent.factom.entry-credits.address}')}")
+    @Scope("prototype")
+    public WalletdClient offlineWalletDClient() {
+        return new OfflineWalletdClientImpl();
     }
 
     @Bean
@@ -58,7 +68,7 @@ public class FactomConfig {
     @Bean
     public String factomChainId(final FactomClient factomClient,
                                 @Value("${sphereon.blockchain.agent.factom.chain.id:#{null}}") final String configuredChainId,
-                                @Value("${sphereon.blockchain.agent.factom.chain.names:#{java.util.Collections.emptyList()}}") final List<String> configuredChainNames,
+                                @Value("${sphereon.blockchain.agent.factom.chain.names:#{T(java.util.Collections).emptyList()}}") final List<String> configuredChainNames,
                                 final Digest.Algorithm hashAlgorithm) {
         final boolean isChainIdConfigured = configuredChainId != null && !configuredChainId.isEmpty();
         final boolean isChainNamesConfigured = configuredChainNames != null && !configuredChainNames.isEmpty();

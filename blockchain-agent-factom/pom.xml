@@ -60,7 +60,7 @@
         </dependency>
         <dependency>
             <groupId>org.blockchain-innovation.factom.client</groupId>
-            <artifactId>spring-boot-support</artifactId>
+            <artifactId>factom-client-offline-signing</artifactId>
             <version>${factom-client.version}</version>
             <scope>compile</scope>
         </dependency>

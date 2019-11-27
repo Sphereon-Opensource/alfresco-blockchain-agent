@@ -11,13 +11,7 @@
       {
         "matchesJsonPath": {
           "expression": "method",
-          "equalTo": "commit-entry"
-        }
-      },
-      {
-        "matchesJsonPath": {
-          "expression": "params.message",
-          "equalTo": "dummy-hash-001-commit-message"
+          "equalTo": "reveal-entry"
         }
       },
       {
@@ -30,6 +24,6 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "responses/commit-entry-dummy-hash-001.json"
+    "bodyFileName": "responses/reveal-entry-dummy-hash-003-offline.json"
   }
 }

@@ -16,12 +16,6 @@
       },
       {
         "matchesJsonPath": {
-          "expression": "params.message",
-          "equalTo": "dummy-hash-001-commit-message"
-        }
-      },
-      {
-        "matchesJsonPath": {
           "expression": "jsonrpc",
           "equalTo": "2.0"
         }
@@ -30,6 +24,6 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "responses/commit-entry-dummy-hash-001.json"
+    "bodyFileName": "responses/commit-entry-dummy-hash-003-offline.json"
   }
 }

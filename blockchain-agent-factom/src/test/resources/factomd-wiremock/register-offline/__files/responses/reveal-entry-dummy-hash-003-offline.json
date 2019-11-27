@@ -1,0 +1,9 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "message": "dummy-reveal-message-return",
+    "entryhash": "dummy-entry-hash-003",
+    "chainId": "fe07dab8c2917366f376b454736ac07865626074691b30ffddddda4ff02a9451"
+  }
+}

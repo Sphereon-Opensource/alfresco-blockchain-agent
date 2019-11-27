@@ -16,6 +16,7 @@ import org.blockchain_innovation.factom.client.api.model.response.factomd.EntryR
 import org.blockchain_innovation.factom.client.api.model.response.factomd.RevealResponse;
 import org.blockchain_innovation.factom.client.api.model.response.walletd.ComposeResponse;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
+import org.blockchain_innovation.factom.client.impl.OfflineWalletdClientImpl;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -101,12 +102,17 @@ public class FactomClient {
     }
 
     private CompletableFuture<ComposeResponse> composeEntry(final Entry entry) {
+        if (this.walletdClient instanceof OfflineWalletdClientImpl) {
+            return this.walletdClient.composeEntry(entry, this.entryCreditsAddress)
+                    .thenApply(FactomResponse::getResult);
+        }
+
         return this.walletdClient.composeEntry(entry, this.entryCreditsAddress)
                 .thenApply(this::validateFactomResponse);
     }
 
-    private CompletableFuture<CommitEntryResponse> commitEntry(final ComposeResponse commitResult) {
-        return this.factomdClient.commitEntry(commitResult.getCommit().getParams().getMessage())
+    private CompletableFuture<CommitEntryResponse> commitEntry(final ComposeResponse composeResult) {
+        return this.factomdClient.commitEntry(composeResult.getCommit().getParams().getMessage())
                 .thenApply(this::validateFactomResponse);
     }
 
