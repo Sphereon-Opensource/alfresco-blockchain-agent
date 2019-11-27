@@ -33,7 +33,7 @@ public class ProofRegisterTask implements RegisterTask {
 
     @Override
     public void registerHash(byte[] contentHash) {
-        var contentRequest = new ContentRequest();
+        final var contentRequest = new ContentRequest();
         contentRequest.setContent(contentHash);
         contentRequest.setHashProvider(ContentRequest.HashProviderEnum.CLIENT);
         try {
