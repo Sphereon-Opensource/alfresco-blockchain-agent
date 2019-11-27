@@ -152,8 +152,6 @@ public class AlfrescoRepository {
             alfrescoNodesApi.updateNode(alfrescoNodeId, update, include, null);
 
             logger.info("Node " + alfrescoNodeId + " updated");
-        } catch (ApiException exception) {
-            throw new RuntimeException("An error occurred whilst updating state in node " + alfrescoNodeId, exception);
         } catch (Exception exception) {
             throw new RuntimeException("An error occurred whilst updating state in node " + alfrescoNodeId, exception);
         }

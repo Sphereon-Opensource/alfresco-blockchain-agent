@@ -31,6 +31,7 @@ import static java.util.Optional.empty;
 @Component
 public class FactomClient {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FactomClient.class);
+    public static final String NO_PREVIOUS_MERKLE_ROOT = "0000000000000000000000000000000000000000000000000000000000000000";
 
     private FactomdClient factomdClient;
     private WalletdClient walletdClient;
@@ -57,14 +58,14 @@ public class FactomClient {
         }
     }
 
-    private <T> T handleCommitEntry(T commitResponse, Throwable throwable) {
+    private <T> T handleCommitEntry(final T commitResponse, final Throwable throwable) {
         if (throwable != null) {
             logger.error("Commit entry failed. Will try reveal next.", throwable);
         }
-        return null;
+        return commitResponse;
     }
 
-    public RevealResponse createChainFromEntry(Entry entry) {
+    public RevealResponse createChainFromEntry(final Entry entry) {
         final var chain = new Chain();
         chain.setFirstEntry(entry);
 
@@ -94,7 +95,7 @@ public class FactomClient {
         }
     }
 
-    private CompletableFuture<ChainHeadResponse> getChainHead(String chainId) {
+    private CompletableFuture<ChainHeadResponse> getChainHead(final String chainId) {
         return this.factomdClient.chainHead(chainId)
                 .thenApply(this::validateFactomResponse);
     }
@@ -104,42 +105,46 @@ public class FactomClient {
                 .thenApply(this::validateFactomResponse);
     }
 
-    private CompletableFuture<CommitEntryResponse> commitEntry(ComposeResponse commitResult) {
+    private CompletableFuture<CommitEntryResponse> commitEntry(final ComposeResponse commitResult) {
         return this.factomdClient.commitEntry(commitResult.getCommit().getParams().getMessage())
                 .thenApply(this::validateFactomResponse);
     }
 
-    private CompletableFuture<RevealResponse> revealEntry(ComposeResponse composeResult) {
+    private CompletableFuture<RevealResponse> revealEntry(final ComposeResponse composeResult) {
         return this.factomdClient.revealEntry(composeResult.getReveal().getParams().getEntry())
                 .thenApply(this::validateFactomResponse);
     }
 
-    private <T> T validateFactomResponse(FactomResponse<T> factomResponse) {
-        if (factomResponse == null || 200 != factomResponse.getHTTPResponseCode()) {
+    private <T> T validateFactomResponse(final FactomResponse<T> factomResponse) {
+        if (factomResponse == null) {
             throw new FactomRuntimeException("Error retrieving response from Factom daemon");
+        }
+        if (200 != factomResponse.getHTTPResponseCode()) {
+            final var message = String.format("Error retrieving response from Factom daemon. Responsecode: %s", factomResponse.getHTTPResponseCode());
+            throw new FactomRuntimeException(message);
         }
         return factomResponse.getResult();
     }
 
-    private CompletableFuture<RevealResponse> revealChain(ComposeResponse.Reveal reveal) {
+    private CompletableFuture<RevealResponse> revealChain(final ComposeResponse.Reveal reveal) {
         final String chainId = reveal.getParams().getEntry();
         return this.factomdClient.revealChain(chainId)
                 .thenApply(this::validateFactomResponse);
     }
 
-    private CompletableFuture<CommitChainResponse> commitChain(ComposeResponse.Commit commit) {
+    private CompletableFuture<CommitChainResponse> commitChain(final ComposeResponse.Commit commit) {
         final var commitMessage = commit.getParams().getMessage();
         return this.factomdClient.commitChain(commitMessage)
                 .thenApply(this::validateFactomResponse);
     }
 
-    private CompletableFuture<ComposeResponse> composeChain(Chain chain) {
+    private CompletableFuture<ComposeResponse> composeChain(final Chain chain) {
         return this.walletdClient.composeChain(chain, this.entryCreditsAddress)
                 .thenApply(this::validateFactomResponse);
     }
 
     private CompletableFuture<Optional<Entry>> findEntryStartingAtMerkleRoot(final String merkleRoot, final byte[] contentHash) {
-        if (merkleRoot.equals("0000000000000000000000000000000000000000000000000000000000000000")) {
+        if (merkleRoot.equals(NO_PREVIOUS_MERKLE_ROOT)) {
             return CompletableFuture.completedFuture(empty());
         }
 
