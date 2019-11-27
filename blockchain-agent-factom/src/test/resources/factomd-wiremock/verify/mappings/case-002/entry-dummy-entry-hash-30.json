@@ -11,13 +11,13 @@
       {
         "matchesJsonPath": {
           "expression": "method",
-          "equalTo": "commit-entry"
+          "equalTo": "entry"
         }
       },
       {
         "matchesJsonPath": {
-          "expression": "params.message",
-          "equalTo": "dummy-hash-001-commit-message"
+          "expression": "params.hash",
+          "equalTo": "dummy-entry-hash-30"
         }
       },
       {
@@ -30,6 +30,6 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "response/commit-entry-dummy-hash-001.json"
+    "bodyFileName": "responses/case-002/entry-dummy-entry-hash-30-response.json"
   }
 }

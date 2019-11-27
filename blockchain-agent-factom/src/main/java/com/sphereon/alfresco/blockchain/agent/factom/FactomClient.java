@@ -1,5 +1,6 @@
 package com.sphereon.alfresco.blockchain.agent.factom;
 
+import com.sphereon.alfresco.blockchain.agent.factom.config.ExternalIds;
 import org.blockchain_innovation.factom.client.api.FactomResponse;
 import org.blockchain_innovation.factom.client.api.FactomdClient;
 import org.blockchain_innovation.factom.client.api.WalletdClient;
@@ -83,13 +84,13 @@ public class FactomClient {
         final var entryVerification = getChainHead(chainId)
                 .thenCompose(chainHeadResponse -> {
                     final var keyMerkleRoot = chainHeadResponse.getChainHead();
-                    return getEntryFromMerkleRoot(keyMerkleRoot, contentHash);
+                    return findEntryStartingAtMerkleRoot(keyMerkleRoot, contentHash);
                 });
 
         try {
             return entryVerification.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new FactomRuntimeException("Error retrieving response from Factom daemon on creating chain", e);
+            throw new FactomRuntimeException("Error retrieving response from Factom daemon on verifying entry", e);
         }
     }
 
@@ -137,7 +138,7 @@ public class FactomClient {
                 .thenApply(this::validateFactomResponse);
     }
 
-    private CompletableFuture<Optional<Entry>> getEntryFromMerkleRoot(final String merkleRoot, final byte[] contentHash) {
+    private CompletableFuture<Optional<Entry>> findEntryStartingAtMerkleRoot(final String merkleRoot, final byte[] contentHash) {
         if (merkleRoot.equals("0000000000000000000000000000000000000000000000000000000000000000")) {
             return CompletableFuture.completedFuture(empty());
         }
@@ -150,7 +151,7 @@ public class FactomClient {
                             }
 
                             final var previousKeyMR = entryBlockResponse.getHeader().getPreviousKeyMR();
-                            return getEntryFromMerkleRoot(previousKeyMR, contentHash);
+                            return findEntryStartingAtMerkleRoot(previousKeyMR, contentHash);
                         }));
     }
 
@@ -160,7 +161,7 @@ public class FactomClient {
     }
 
     private CompletableFuture<Optional<Entry>> findEntryInList(final byte[] contentHash, final List<EntryBlockResponse.Entry> entryList) {
-        final String contentInHex = Encoding.HEX.encode(contentHash);
+        final String contentHashInHex = Encoding.HEX.encode(contentHash);
 
         final var findEntries = new CompletableFuture<Optional<Entry>>();
         entryList.stream()
@@ -169,7 +170,7 @@ public class FactomClient {
                     return getEntry(entryHash);
                 })
                 .map(CompletableFuture::join)
-                .filter(entry -> entry.getContent().equals(contentInHex))
+                .filter(entry -> entryMatches(entry, contentHashInHex))
                 .findFirst()
                 .map(entry -> {
                     final var bifEntry = new Entry();
@@ -182,6 +183,17 @@ public class FactomClient {
                 .ifPresentOrElse(findEntries::complete, () -> findEntries.complete(empty()));
 
         return findEntries;
+    }
+
+    private boolean entryMatches(final EntryResponse entry, final String contentHashInHex) {
+        final List<String> extIds = entry.getExtIds();
+        if (extIds == null || extIds.size() < 2) {
+            return false;
+        }
+
+        // TODO: Verify signature
+        final var firstExtIdPairKey = Encoding.HEX.encode(ExternalIds.HASH.getBytes());
+        return extIds.get(0).equals(firstExtIdPairKey) && extIds.get(1).equals(contentHashInHex);
     }
 
     private CompletableFuture<EntryResponse> getEntry(final String entryHash) {

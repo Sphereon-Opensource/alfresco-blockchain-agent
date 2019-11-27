@@ -1,0 +1,12 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "chainid": "fe07dab8c2917366f376b454736ac07865626074691b30ffddddda4ff02a9451",
+    "content": "// TODO: Signature",
+    "extids": [
+      "48617368",
+      "not-the-hash-you-are-looking-for"
+    ]
+  }
+}

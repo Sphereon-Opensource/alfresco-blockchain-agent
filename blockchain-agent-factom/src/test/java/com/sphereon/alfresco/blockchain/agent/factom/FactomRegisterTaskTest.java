@@ -20,12 +20,13 @@ public class FactomRegisterTaskTest {
     @ClassRule
     public static WireMockClassRule factomDWiremock = new WireMockClassRule(wireMockConfig()
             .port(9088)
-            .usingFilesUnderDirectory("src/test/resources/factomd-wiremock"));
+            .withRootDirectory("src/test/resources/factomd-wiremock/register")
+            .usingFilesUnderDirectory("src/test/resources/factomd-wiremock/register"));
 
     @ClassRule
     public static WireMockClassRule factomWalletDWiremock = new WireMockClassRule(wireMockConfig()
             .port(9089)
-            .usingFilesUnderDirectory("src/test/resources/factom-walletd-wiremock"));
+            .usingFilesUnderDirectory("src/test/resources/factom-walletd-wiremock/register"));
 
     @Test
     public void taskShouldRegisterHash() {

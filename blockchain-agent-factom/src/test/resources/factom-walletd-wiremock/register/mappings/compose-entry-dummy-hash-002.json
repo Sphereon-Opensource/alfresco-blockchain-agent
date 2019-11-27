@@ -23,7 +23,7 @@
       {
         "matchesJsonPath": {
           "expression": "params.entry.extids[1]",
-          "equalTo": "44756d6d792d686173682d303031"
+          "equalTo": "44756d6d792d686173682d303032"
         }
       },
       {
@@ -36,6 +36,6 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "response/compose-entry-dummy-hash-001.json"
+    "bodyFileName": "responses/compose-entry-dummy-hash-002.json"
   }
 }

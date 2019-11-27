@@ -27,3 +27,12 @@ sphereon.blockchain.agent.factom.chain.id=fe07dab8c2917366f376b454736ac078656260
 sphereon.blockchain.agent.factom.chain.create=true
 ```
 If a chain ID is specified, the create property will be ignored.
+
+# Tests
+
+The alfresco-blockchain-agent-factom module is tested using Wiremock.
+Mappings and responses have been defined in `src/resources/factom-walletd-wiremock` and `/src/resources/factomd-wiremock`.
+Within both of these folders, there are two folders corresponding to the two main tasks: registration and verification.
+Within these folders, the standard Wiremock setup applies of having `mapping` files (to match to an incoming HTTP requests) and `responses` (responses sent back as referenced from mappings).
+
+The tests use `WireMockClassRule` to activate the needed combination of FactomD or WalletD and registration or verification.

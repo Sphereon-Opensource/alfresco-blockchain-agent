@@ -11,13 +11,13 @@
       {
         "matchesJsonPath": {
           "expression": "method",
-          "equalTo": "reveal-entry"
+          "equalTo": "entry"
         }
       },
       {
         "matchesJsonPath": {
-          "expression": "params.entry",
-          "equalTo": "dummy-hash-001-reveal-entry"
+          "expression": "params.hash",
+          "equalTo": "dummy-entry-hash-20"
         }
       },
       {
@@ -30,6 +30,6 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "response/reveal-entry-dummy-hash-001.json"
+    "bodyFileName": "responses/case-002/entry-dummy-entry-hash-20-response.json"
   }
 }

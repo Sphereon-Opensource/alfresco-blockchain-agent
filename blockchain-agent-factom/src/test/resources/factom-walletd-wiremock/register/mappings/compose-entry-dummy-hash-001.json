@@ -1,0 +1,41 @@
+{
+  "request": {
+    "urlPath": "/v2",
+    "method": "POST",
+    "headers": {
+      "Content-Type": {
+        "equalTo": "application/json"
+      }
+    },
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": {
+          "expression": "method",
+          "equalTo": "compose-entry"
+        }
+      },
+      {
+        "matchesJsonPath": {
+          "expression": "params.entry.chainid",
+          "equalTo": "fe07dab8c2917366f376b454736ac07865626074691b30ffddddda4ff02a9451"
+        }
+      },
+      {
+        "matchesJsonPath": {
+          "expression": "params.entry.extids[1]",
+          "equalTo": "44756d6d792d686173682d303031"
+        }
+      },
+      {
+        "matchesJsonPath": {
+          "expression": "jsonrpc",
+          "equalTo": "2.0"
+        }
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "responses/compose-entry-dummy-hash-001.json"
+  }
+}

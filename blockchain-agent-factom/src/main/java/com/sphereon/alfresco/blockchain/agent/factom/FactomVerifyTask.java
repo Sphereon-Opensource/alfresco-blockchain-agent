@@ -25,7 +25,7 @@ public class FactomVerifyTask implements VerifyTask {
 
         final VerifyContentAlfrescoResponse verifyContentResponse = new VerifyContentAlfrescoResponse();
 
-        entry.ifPresent(entryMatch -> verifyContentResponse.setHash(entryMatch.getContent()));
+        entry.ifPresent(entryMatch -> verifyContentResponse.setHash(entryMatch.getExternalIds().get(1)));
 
         return verifyContentResponse;
     }

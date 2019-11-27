@@ -1,0 +1,35 @@
+{
+  "request": {
+    "urlPath": "/v2",
+    "method": "POST",
+    "headers": {
+      "Content-Type": {
+        "equalTo": "application/json"
+      }
+    },
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": {
+          "expression": "method",
+          "equalTo": "entry-block"
+        }
+      },
+      {
+        "matchesJsonPath": {
+          "expression": "params.keymr",
+          "equalTo": "dummy-merkle-root-1"
+        }
+      },
+      {
+        "matchesJsonPath": {
+          "expression": "jsonrpc",
+          "equalTo": "2.0"
+        }
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "responses/case-001/entry-block-1-response.json"
+  }
+}

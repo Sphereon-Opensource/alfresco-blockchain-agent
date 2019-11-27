@@ -1,0 +1,12 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "chainid": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "content": "",
+    "extids": [
+      "48617368",
+      "not-the-hash-you-are-looking-for"
+    ]
+  }
+}
