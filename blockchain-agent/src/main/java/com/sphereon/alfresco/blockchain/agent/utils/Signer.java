@@ -5,14 +5,15 @@ import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.ResourceUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -61,8 +62,8 @@ public class Signer {
         }
     }
 
-    private InputStream getCertificateStream() {
-        final var certificatePath = Paths.get(certificatePathString);
+    private InputStream getCertificateStream() throws FileNotFoundException {
+        final var certificatePath = ResourceUtils.getFile(certificatePathString).toPath();
 
         if (!Files.exists(certificatePath)) {
             throw new RuntimeException("Certificate " + certificatePathString + " could not be found.");
