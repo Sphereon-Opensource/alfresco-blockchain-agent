@@ -1,6 +1,6 @@
-package com.sphereon.alfresco.blockchain.agent.proof.tasks;
+package com.sphereon.alfresco.blockchain.agent.sphereon.proof.tasks;
 
-import com.sphereon.alfresco.blockchain.agent.proof.ProofApiUtils;
+import com.sphereon.alfresco.blockchain.agent.sphereon.proof.ProofApiUtils;
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
 import com.sphereon.alfresco.blockchain.agent.tasks.VerifyTask;
 import com.sphereon.alfresco.blockchain.agent.utils.Signer;

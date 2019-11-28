@@ -1,4 +1,4 @@
-package com.sphereon.alfresco.blockchain.agent.proof;
+package com.sphereon.alfresco.blockchain.agent.sphereon.proof;
 
 import com.sphereon.sdk.blockchain.proof.api.ConfigurationApi;
 import com.sphereon.sdk.blockchain.proof.handler.ApiException;

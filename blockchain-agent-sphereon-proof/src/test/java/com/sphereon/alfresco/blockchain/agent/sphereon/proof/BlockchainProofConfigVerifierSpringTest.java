@@ -1,4 +1,4 @@
-package com.sphereon.alfresco.blockchain.agent.proof;
+package com.sphereon.alfresco.blockchain.agent.sphereon.proof;
 
 import com.sphereon.alfresco.blockchain.agent.AlfrescoBlockchainAgentApp;
 import com.sphereon.alfresco.blockchain.agent.utils.Signer;
@@ -56,7 +56,7 @@ public class BlockchainProofConfigVerifierSpringTest {
     private ConfigurationApi configurationApiMock;
 
     @Test
-    @Ignore("This test needs environment variables, see README")
+    @Ignore("This test needs environment variables which are difficult to mock. Should be fixed in authentication-lib. See README")
     public void shouldBeCalledOnApplicationStart() throws ApiException {
         verify(configurationApiMock).getConfiguration(eq("dummy-proof-config"));
         verifyNoMoreInteractions(configurationApiMock);

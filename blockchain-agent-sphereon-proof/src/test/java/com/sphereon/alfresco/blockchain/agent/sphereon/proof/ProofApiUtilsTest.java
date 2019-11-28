@@ -1,4 +1,4 @@
-package com.sphereon.alfresco.blockchain.agent.proof;
+package com.sphereon.alfresco.blockchain.agent.sphereon.proof;
 
 import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
 import com.sphereon.sdk.blockchain.proof.model.VerifyContentResponse;
