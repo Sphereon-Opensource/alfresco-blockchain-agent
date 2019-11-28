@@ -1,7 +1,7 @@
 package com.sphereon.alfresco.blockchain.agent.sphereon.proof.tasks;
 
+import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentBlockchainResponse;
 import com.sphereon.alfresco.blockchain.agent.sphereon.proof.ProofApiUtils;
-import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
 import com.sphereon.alfresco.blockchain.agent.tasks.VerifyTask;
 import com.sphereon.alfresco.blockchain.agent.utils.Signer;
 import com.sphereon.libs.authentication.api.TokenRequest;
@@ -33,8 +33,8 @@ public class ProofVerifyTask implements VerifyTask {
     }
 
     @Override
-    public VerifyContentAlfrescoResponse verifyHash(final byte[] contentHash) {
-        return this.utils.toAlfrescoResponse(verify(contentHash));
+    public VerifyContentBlockchainResponse verifyHash(final byte[] contentHash) {
+        return this.utils.toBlockchainResponse(verify(contentHash));
     }
 
     private VerifyContentResponse verify(final byte[] contentHash) {

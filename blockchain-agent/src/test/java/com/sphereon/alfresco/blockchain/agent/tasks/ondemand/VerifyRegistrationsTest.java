@@ -3,7 +3,7 @@ package com.sphereon.alfresco.blockchain.agent.tasks.ondemand;
 import com.alfresco.apis.model.Node;
 import com.alfresco.apis.model.NodeEntry;
 import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
-import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
+import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentBlockchainResponse;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
 import com.sphereon.alfresco.blockchain.agent.tasks.VerifyTask;
 import com.sphereon.alfresco.blockchain.agent.utils.Hasher;
@@ -17,10 +17,11 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
-import static com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState.NOT_REGISTERED;
-import static com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState.PENDING_REGISTRATION;
-import static com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState.PENDING_VERIFICATION;
-import static com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState.REGISTERED;
+import static com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState.ALF_NOT_REGISTERED;
+import static com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState.ALF_PENDING_REGISTRATION;
+import static com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState.ALF_PENDING_VERIFICATION;
+import static com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState.ALF_REGISTERED;
+import static com.sphereon.alfresco.blockchain.agent.model.BlockchainRegistrationState.BC_REGISTERED;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,21 +55,14 @@ public class VerifyRegistrationsTest {
     }
 
     @Test
-    public void shouldVerifyNodesWithCredentials() {
-        final var nodeIds = asList("1", "2", "3", "4");
-        final var credentials = "Bearer dummy-token";
-
-    }
-
-    @Test
     public void shouldVerifyNodes() {
         final var nodeIds = asList("1", "2", "3", "4");
 
         final var alfrescoNodes = asList(
-                buildAlfrescoNode("1", PENDING_REGISTRATION),
-                buildAlfrescoNode("2", PENDING_VERIFICATION),
-                buildAlfrescoNode("3", NOT_REGISTERED),
-                buildAlfrescoNode("4", REGISTERED)
+                buildAlfrescoNode("1", ALF_PENDING_REGISTRATION),
+                buildAlfrescoNode("2", ALF_PENDING_VERIFICATION),
+                buildAlfrescoNode("3", ALF_NOT_REGISTERED),
+                buildAlfrescoNode("4", ALF_REGISTERED)
         );
 
         when(alfrescoRepositoryMock.selectAlfrescoNodes(eq(nodeIds)))
@@ -81,24 +75,22 @@ public class VerifyRegistrationsTest {
             when(alfrescoRepositoryMock.getEntry(eq(id)))
                     .thenReturn(content);
 
-            final var response = new VerifyContentAlfrescoResponse();
-            response.setRegistrationState(REGISTERED);
-            response.setRegistrationTime(OffsetDateTime.now(dummyClock));
+            final var response = new VerifyContentBlockchainResponse(BC_REGISTERED, OffsetDateTime.now(dummyClock));
             when(verificationTask.verifyHash(eq(contentHash)))
                     .thenReturn(response);
         }
 
         final var result = this.verification.execute(nodeIds, "");
         assertThat(result.size()).isEqualTo(3);
-        assertThat(result.get(0).getRegistrationState()).isEqualTo(REGISTERED);
+        assertThat(result.get(0).getRegistrationState()).isEqualTo(ALF_REGISTERED);
         assertThat(result.get(0).getRegistrationTime()).isEqualTo(OffsetDateTime.now(dummyClock));
 
         verify(alfrescoRepositoryMock).selectAlfrescoNodes(eq(nodeIds));
         verify(alfrescoRepositoryMock, times(3)).getEntry(anyString());
 
-        verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("2", REGISTERED, OffsetDateTime.now(dummyClock), null, null);
-        verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("3", REGISTERED, OffsetDateTime.now(dummyClock), null, null);
-        verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("4", REGISTERED, OffsetDateTime.now(dummyClock), null, null);
+        verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("2", ALF_REGISTERED, OffsetDateTime.now(dummyClock), null, null);
+        verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("3", ALF_REGISTERED, OffsetDateTime.now(dummyClock), null, null);
+        verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("4", ALF_REGISTERED, OffsetDateTime.now(dummyClock), null, null);
 
         verifyNoMoreInteractions(alfrescoRepositoryMock);
 
@@ -111,10 +103,10 @@ public class VerifyRegistrationsTest {
         final var nodeIds = asList("1", "2", "3", "4");
 
         final var alfrescoNodes = asList(
-                buildAlfrescoNode("1", PENDING_REGISTRATION),
-                buildAlfrescoNode("2", PENDING_VERIFICATION),
-                buildAlfrescoNode("3", NOT_REGISTERED),
-                buildAlfrescoNode("4", REGISTERED)
+                buildAlfrescoNode("1", ALF_PENDING_REGISTRATION),
+                buildAlfrescoNode("2", ALF_PENDING_VERIFICATION),
+                buildAlfrescoNode("3", ALF_NOT_REGISTERED),
+                buildAlfrescoNode("4", ALF_REGISTERED)
         );
 
         when(alfrescoRepositoryMock.selectAlfrescoNodes(eq(nodeIds)))
@@ -127,9 +119,7 @@ public class VerifyRegistrationsTest {
             when(alfrescoRepositoryMock.getEntry(eq(id)))
                     .thenReturn(content);
 
-            final var response = new VerifyContentAlfrescoResponse();
-            response.setRegistrationState(REGISTERED);
-            response.setRegistrationTime(OffsetDateTime.now(dummyClock));
+            final var response = new VerifyContentBlockchainResponse(BC_REGISTERED, OffsetDateTime.now(dummyClock));
             when(verificationTask.verifyHash(eq(contentHash)))
                     .thenReturn(response);
         }
@@ -140,14 +130,14 @@ public class VerifyRegistrationsTest {
 
         final var result = this.verification.execute(nodeIds, "");
         assertThat(result.size()).isEqualTo(1);
-        assertThat(result.get(0).getRegistrationState()).isEqualTo(REGISTERED);
+        assertThat(result.get(0).getRegistrationState()).isEqualTo(ALF_REGISTERED);
         assertThat(result.get(0).getRegistrationTime()).isEqualTo(OffsetDateTime.now(dummyClock));
 
         verify(alfrescoRepositoryMock).selectAlfrescoNodes(eq(nodeIds));
         verify(alfrescoRepositoryMock, times(2)).getEntry(anyString());
 
-        verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("2", REGISTERED, OffsetDateTime.now(dummyClock), null, null);
-        verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("3", REGISTERED, OffsetDateTime.now(dummyClock), null, null);
+        verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("2", ALF_REGISTERED, OffsetDateTime.now(dummyClock), null, null);
+        verify(alfrescoRepositoryMock).updateAlfrescoNodeWith("3", ALF_REGISTERED, OffsetDateTime.now(dummyClock), null, null);
 
         verifyNoMoreInteractions(alfrescoRepositoryMock);
 

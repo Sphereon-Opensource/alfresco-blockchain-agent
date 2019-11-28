@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState.ALF_REGISTERED;
+
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class AlfrescoRepository {
@@ -123,7 +125,7 @@ public class AlfrescoRepository {
                 .put("bc:LastVerificationTime", now)
                 .put("bc:RegistrationState", blockchainRegistrationState.getKey());
 
-        if (blockchainRegistrationState == AlfrescoBlockchainRegistrationState.REGISTERED) {
+        if (blockchainRegistrationState == ALF_REGISTERED) {
             if (blockchainRegistrationTime != null) {
                 properties.put("bc:RegistrationTime", TIME_FORMATTER.format(blockchainRegistrationTime));
             }

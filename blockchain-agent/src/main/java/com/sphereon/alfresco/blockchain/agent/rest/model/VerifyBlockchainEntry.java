@@ -14,12 +14,13 @@ public class VerifyBlockchainEntry {
     @XmlElement
     @ApiModelProperty
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String entryId;
-
-    @XmlElement
-    @ApiModelProperty
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String chainId;
+
+    public VerifyBlockchainEntry(final VerifyBlockchainEntryChainType type,
+                                 final String chainId) {
+        this.chainType = type;
+        this.chainId = chainId;
+    }
 
     public VerifyBlockchainEntryChainType getChainType() {
         return chainType;
@@ -27,14 +28,6 @@ public class VerifyBlockchainEntry {
 
     public void setChainType(VerifyBlockchainEntryChainType chainType) {
         this.chainType = chainType;
-    }
-
-    public String getEntryId() {
-        return entryId;
-    }
-
-    public void setEntryId(String entryId) {
-        this.entryId = entryId;
     }
 
     public String getChainId() {

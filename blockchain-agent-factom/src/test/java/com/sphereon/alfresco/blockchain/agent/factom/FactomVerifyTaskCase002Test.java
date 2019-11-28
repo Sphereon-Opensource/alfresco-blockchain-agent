@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState.REGISTERED;
+import static com.sphereon.alfresco.blockchain.agent.model.BlockchainRegistrationState.BC_REGISTERED;
 import static org.junit.Assert.assertEquals;
 
 @SpringBootTest(properties = {"sphereon.blockchain.agent.factom.chain.id=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"})
@@ -35,6 +35,6 @@ public class FactomVerifyTaskCase002Test {
         final var dummyHash = "Dummy-hash-002";
         final var response = this.factomVerifyTask.verifyHash(dummyHash.getBytes());
         assertEquals(Encoding.BASE64.encode(dummyHash.getBytes()), response.getHash());
-        assertEquals(REGISTERED, response.getRegistrationState());
+        assertEquals(BC_REGISTERED, response.getRegistrationState());
     }
 }

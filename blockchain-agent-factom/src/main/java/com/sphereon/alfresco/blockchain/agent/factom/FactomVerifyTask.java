@@ -1,14 +1,20 @@
 package com.sphereon.alfresco.blockchain.agent.factom;
 
-import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
-import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
+import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyBlockchainEntry;
+import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyBlockchainEntryChainType;
+import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentBlockchainResponse;
 import com.sphereon.alfresco.blockchain.agent.tasks.VerifyTask;
 import org.blockchain_innovation.factom.client.api.model.Entry;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Consumer;
+import java.util.List;
+import java.util.Optional;
+
+import static com.sphereon.alfresco.blockchain.agent.model.BlockchainRegistrationState.BC_NOT_REGISTERED;
+import static com.sphereon.alfresco.blockchain.agent.model.BlockchainRegistrationState.BC_REGISTERED;
+import static java.util.stream.Collectors.toList;
 
 @Component
 public class FactomVerifyTask implements VerifyTask {
@@ -22,16 +28,15 @@ public class FactomVerifyTask implements VerifyTask {
     }
 
     @Override
-    public VerifyContentAlfrescoResponse verifyHash(final byte[] contentHash) {
-        final var response = new VerifyContentAlfrescoResponse();
-        response.setHash(Encoding.BASE64.encode(contentHash));
+    public VerifyContentBlockchainResponse verifyHash(final byte[] contentHash) {
+        final var hash = Encoding.BASE64.encode(contentHash);
 
-        final Consumer<Entry> ifPresent = entry -> response.setRegistrationState(AlfrescoBlockchainRegistrationState.REGISTERED);
-        final Runnable ifNotPresent = () -> response.setRegistrationState(AlfrescoBlockchainRegistrationState.NOT_REGISTERED);
+        final Optional<Entry> entry = this.factomClient.verifyEntry(chainId, contentHash);
+        final var registrationState = entry.isPresent() ? BC_REGISTERED : BC_NOT_REGISTERED;
+        final List<VerifyBlockchainEntry> entries = entry.stream()
+                .map(e -> new VerifyBlockchainEntry(VerifyBlockchainEntryChainType.SINGLE_CHAIN, e.getChainId()))
+                .collect(toList());
 
-        this.factomClient.verifyEntry(chainId, contentHash)
-                .ifPresentOrElse(ifPresent, ifNotPresent);
-
-        return response;
+        return new VerifyContentBlockchainResponse(hash, entries, registrationState);
     }
 }
