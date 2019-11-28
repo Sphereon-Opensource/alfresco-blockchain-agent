@@ -39,13 +39,13 @@ class AlfrescoApisConfig {
                        @Value("${sphereon.blockchain.agent.alfresco.dns-name}") final String alfrescoDnsName,
                        @Value("${sphereon.blockchain.agent.alfresco.username}") final String userName,
                        @Value("${sphereon.blockchain.agent.alfresco.password}") final String password) {
-        this.authenticationApiClient = createClient(AUTHENTICATION_API_PATH);
-        this.coreApiClient = createClient(CORE_API_PATH);
-        this.searchApiClient = createClient(SEARCH_API_PATH);
         this.connectionTimeout = connectionTimeout;
         this.alfrescoDnsName = alfrescoDnsName;
         this.userName = userName; // from system env
         this.password = password; // from system env
+        this.authenticationApiClient = createClient(AUTHENTICATION_API_PATH);
+        this.coreApiClient = createClient(CORE_API_PATH);
+        this.searchApiClient = createClient(SEARCH_API_PATH);
     }
 
     @Bean
