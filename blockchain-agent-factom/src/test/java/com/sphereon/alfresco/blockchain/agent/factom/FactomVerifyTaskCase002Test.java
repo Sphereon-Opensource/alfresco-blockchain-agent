@@ -1,7 +1,6 @@
 package com.sphereon.alfresco.blockchain.agent.factom;
 
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
-import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
 import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -11,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState.REGISTERED;
 import static org.junit.Assert.assertEquals;
 
 @SpringBootTest(properties = {"sphereon.blockchain.agent.factom.chain.id=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"})
@@ -22,7 +22,7 @@ public class FactomVerifyTaskCase002Test {
     @ClassRule
     public static WireMockClassRule factomDWiremock = new WireMockClassRule(wireMockConfig()
             .port(9088)
-            .usingFilesUnderDirectory("src/test/resources/factomd-wiremock/verify"));
+            .usingFilesUnderDirectory("src/test/resources/factomd-wiremock/verify/case-002"));
 
     @Test
     /*
@@ -33,7 +33,8 @@ public class FactomVerifyTaskCase002Test {
      */
     public void shouldVerifyHashInPreviousBlock() {
         final var dummyHash = "Dummy-hash-002";
-        final VerifyContentAlfrescoResponse verifyContentAlfrescoResponse = this.factomVerifyTask.verifyHash(dummyHash.getBytes());
-        assertEquals(Encoding.HEX.encode(dummyHash.getBytes()), verifyContentAlfrescoResponse.getHash());
+        final var response = this.factomVerifyTask.verifyHash(dummyHash.getBytes());
+        assertEquals(Encoding.BASE64.encode(dummyHash.getBytes()), response.getHash());
+        assertEquals(REGISTERED, response.getRegistrationState());
     }
 }

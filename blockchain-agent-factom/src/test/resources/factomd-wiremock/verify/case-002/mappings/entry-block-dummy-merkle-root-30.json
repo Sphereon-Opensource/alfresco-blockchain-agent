@@ -11,13 +11,13 @@
       {
         "matchesJsonPath": {
           "expression": "method",
-          "equalTo": "chain-head"
+          "equalTo": "entry-block"
         }
       },
       {
         "matchesJsonPath": {
-          "expression": "params.chainid",
-          "equalTo": "fe07dab8c2917366f376b454736ac07865626074691b30ffddddda4ff02a9451"
+          "expression": "params.keymr",
+          "equalTo": "dummy-merkle-root-30"
         }
       },
       {
@@ -30,6 +30,6 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "responses/case-001/chain-head-response.json"
+    "bodyFileName": "responses/entry-block-30-response.json"
   }
 }

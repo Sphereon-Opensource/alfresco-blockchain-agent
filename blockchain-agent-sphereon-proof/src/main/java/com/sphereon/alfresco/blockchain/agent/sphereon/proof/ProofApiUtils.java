@@ -9,9 +9,8 @@ import org.springframework.stereotype.Component;
 public class ProofApiUtils {
     public VerifyContentAlfrescoResponse toAlfrescoResponse(final VerifyContentResponse verifyResponse) {
         final var response = new VerifyContentAlfrescoResponse();
-        response.setRequestId(verifyResponse.getRequestId());
-        response.setBase64Signature(verifyResponse.getBase64Signature());
         response.setHash(verifyResponse.getHash());
+        response.setBase64Signature(verifyResponse.getBase64Signature());
         response.setHexSignature(verifyResponse.getHexSignature());
         response.setRegistrationTime(verifyResponse.getRegistrationTime());
         response.setRegistrationState(this.alfrescoRegistrationStateFrom(verifyResponse.getRegistrationState()));

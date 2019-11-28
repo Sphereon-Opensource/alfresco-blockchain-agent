@@ -1,12 +1,14 @@
 package com.sphereon.alfresco.blockchain.agent.factom;
 
+import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
 import com.sphereon.alfresco.blockchain.agent.tasks.VerifyTask;
 import org.blockchain_innovation.factom.client.api.model.Entry;
+import org.blockchain_innovation.factom.client.api.ops.Encoding;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import java.util.function.Consumer;
 
 @Component
 public class FactomVerifyTask implements VerifyTask {
@@ -21,12 +23,15 @@ public class FactomVerifyTask implements VerifyTask {
 
     @Override
     public VerifyContentAlfrescoResponse verifyHash(final byte[] contentHash) {
-        final Optional<Entry> entry = this.factomClient.verifyEntry(chainId, contentHash);
+        final var response = new VerifyContentAlfrescoResponse();
+        response.setHash(Encoding.BASE64.encode(contentHash));
 
-        final VerifyContentAlfrescoResponse verifyContentResponse = new VerifyContentAlfrescoResponse();
+        final Consumer<Entry> ifPresent = entry -> response.setRegistrationState(AlfrescoBlockchainRegistrationState.REGISTERED);
+        final Runnable ifNotPresent = () -> response.setRegistrationState(AlfrescoBlockchainRegistrationState.NOT_REGISTERED);
 
-        entry.ifPresent(entryMatch -> verifyContentResponse.setHash(entryMatch.getExternalIds().get(1)));
+        this.factomClient.verifyEntry(chainId, contentHash)
+                .ifPresentOrElse(ifPresent, ifNotPresent);
 
-        return verifyContentResponse;
+        return response;
     }
 }

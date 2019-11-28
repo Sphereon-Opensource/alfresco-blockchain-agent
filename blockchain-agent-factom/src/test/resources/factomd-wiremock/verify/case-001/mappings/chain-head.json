@@ -11,13 +11,13 @@
       {
         "matchesJsonPath": {
           "expression": "method",
-          "equalTo": "entry"
+          "equalTo": "chain-head"
         }
       },
       {
         "matchesJsonPath": {
-          "expression": "params.hash",
-          "equalTo": "dummy-entry-hash-21"
+          "expression": "params.chainid",
+          "equalTo": "fe07dab8c2917366f376b454736ac07865626074691b30ffddddda4ff02a9451"
         }
       },
       {
@@ -30,6 +30,6 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "responses/case-002/entry-dummy-entry-hash-21-response.json"
+    "bodyFileName": "responses/chain-head-response.json"
   }
 }

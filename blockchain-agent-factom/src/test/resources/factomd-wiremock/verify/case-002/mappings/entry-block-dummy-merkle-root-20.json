@@ -17,7 +17,7 @@
       {
         "matchesJsonPath": {
           "expression": "params.keymr",
-          "equalTo": "dummy-merkle-root-10"
+          "equalTo": "dummy-merkle-root-20"
         }
       },
       {
@@ -30,6 +30,6 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "responses/case-002/entry-block-10-response.json"
+    "bodyFileName": "responses/entry-block-20-response.json"
   }
 }

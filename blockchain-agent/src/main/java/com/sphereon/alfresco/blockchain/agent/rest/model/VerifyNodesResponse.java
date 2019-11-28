@@ -19,7 +19,7 @@ public class VerifyNodesResponse {
     private List<VerifyContentAlfrescoResponse> contentResponses = new ArrayList<>();
 
     public static VerifyNodesResponse wrap(List<VerifyContentAlfrescoResponse> result) {
-        VerifyNodesResponse response = new VerifyNodesResponse();
+        final var response = new VerifyNodesResponse();
         response.setContentResponses(result);
         return response;
     }

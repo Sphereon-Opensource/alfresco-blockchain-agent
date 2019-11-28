@@ -2,6 +2,7 @@ package com.sphereon.alfresco.blockchain.agent.tasks.scheduled;
 
 import com.alfresco.apis.handler.ApiException;
 import com.alfresco.apis.model.ResultNode;
+import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyBlockchainEntryChainType;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
 import com.sphereon.alfresco.blockchain.agent.tasks.VerifyTask;
 import com.sphereon.alfresco.blockchain.agent.utils.Hasher;
@@ -43,8 +44,8 @@ public class VerifyPendingRegistrations {
                 final var verifyResponse = this.verifyTask.verifyHash(contentHash);
                 if (verifyResponse.getRegistrationState() == REGISTERED) {
                     final var registrationState = verifyResponse.getRegistrationState();
-                    final var singleProofChainChainId = verifyResponse.getSingleProofChainId();
-                    final var perHashProofChainChainId = verifyResponse.getPerHashProofChainId();
+                    final var singleProofChainChainId = verifyResponse.getChainId(VerifyBlockchainEntryChainType.SINGLE_CHAIN);
+                    final var perHashProofChainChainId = verifyResponse.getChainId(VerifyBlockchainEntryChainType.PER_HASH_CHAIN);
                     logger.info("Updating state to {} for document {} / {}", registrationState, entry.getName(), entry.getId());
                     this.alfrescoRepository.updateAlfrescoNodeWith(entry.getId(), registrationState, verifyResponse.getRegistrationTime(), singleProofChainChainId, perHashProofChainChainId);
                 } else {

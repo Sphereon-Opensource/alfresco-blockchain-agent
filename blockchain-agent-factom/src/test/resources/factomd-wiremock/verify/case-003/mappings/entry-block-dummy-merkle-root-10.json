@@ -11,13 +11,13 @@
       {
         "matchesJsonPath": {
           "expression": "method",
-          "equalTo": "entry"
+          "equalTo": "entry-block"
         }
       },
       {
         "matchesJsonPath": {
-          "expression": "params.hash",
-          "equalTo": "dummy-entry-hash-3"
+          "expression": "params.keymr",
+          "equalTo": "dummy-merkle-root-10"
         }
       },
       {
@@ -30,6 +30,6 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "responses/case-001/entry-dummy-entry-hash-3-response.json"
+    "bodyFileName": "responses/entry-block-10-response.json"
   }
 }

@@ -3,6 +3,7 @@ package com.sphereon.alfresco.blockchain.agent.tasks.ondemand;
 import com.alfresco.apis.model.Node;
 import com.alfresco.apis.model.NodeEntry;
 import com.google.common.base.Charsets;
+import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyBlockchainEntryChainType;
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyContentAlfrescoResponse;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
 import com.sphereon.alfresco.blockchain.agent.tasks.VerifyTask;
@@ -63,9 +64,12 @@ public class VerifyRegistrations {
                         final var response = verificationTask.verifyHash(contentHash);
                         final var registrationState = response.getRegistrationState();
                         final var registrationTime = response.getRegistrationTime();
-                        final var singleProofChainChainId = response.getSingleProofChainId();
-                        final var perHashProofChainChainId = response.getPerHashProofChainId();
+                        final var singleProofChainChainId = response.getChainId(VerifyBlockchainEntryChainType.SINGLE_CHAIN);
+                        final var perHashProofChainChainId = response.getChainId(VerifyBlockchainEntryChainType.PER_HASH_CHAIN);
                         alfrescoRepository.updateAlfrescoNodeWith(entry.getId(), registrationState, registrationTime, singleProofChainChainId, perHashProofChainChainId);
+
+                        response.setNodeId(entry.getId());
+
                         contentResponses.add(response);
                         if (response.getRegistrationState() != REGISTERED) {
                             logger.info("Document " + entry.getName() + " / " + entry.getId() + " was not registered yet: " + response.getRegistrationState());
