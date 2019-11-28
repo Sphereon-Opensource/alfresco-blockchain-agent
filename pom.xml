@@ -11,7 +11,7 @@
 
     <modules>
         <module>blockchain-agent</module>
-        <module>blockchain-agent-proof</module>
+        <module>blockchain-agent-sphereon-proof</module>
         <module>blockchain-agent-factom</module>
     </modules>
 

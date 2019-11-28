@@ -202,7 +202,19 @@ public class FactomClient {
             return false;
         }
 
+        if (!hashMatches(contentHashInHex, extIds)) {
+            return false;
+        }
+
+        return isSignatureValid(entry.getContent(), contentHashInHex);
+    }
+
+    private boolean isSignatureValid(final String content, final String contentHashInHex) {
         // TODO: Verify signature
+        return true;
+    }
+
+    private boolean hashMatches(String contentHashInHex, List<String> extIds) {
         final var firstExtIdPairKey = Encoding.HEX.encode(ExternalIds.HASH.getBytes());
         return extIds.get(0).equals(firstExtIdPairKey) && extIds.get(1).equals(contentHashInHex);
     }
