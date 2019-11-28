@@ -2,6 +2,7 @@ package com.sphereon.alfresco.blockchain.agent.tasks.scheduled;
 
 import com.alfresco.apis.handler.ApiException;
 import com.alfresco.apis.model.ResultNode;
+import com.alfresco.apis.model.ResultSetRowEntry;
 import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyBlockchainEntryChainType;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
@@ -11,6 +12,8 @@ import com.sphereon.libs.blockchain.commons.Digest;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 import static com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState.ALF_PENDING_VERIFICATION;
 import static com.sphereon.alfresco.blockchain.agent.model.BlockchainRegistrationState.BC_REGISTERED;
@@ -37,24 +40,27 @@ public class VerifyPendingRegistrations {
     public synchronized void execute() {
         try {
             logger.info("Searching for documents with registration state " + ALF_PENDING_VERIFICATION);
-            this.alfrescoRepository.selectAlfrescoNodes(ALF_PENDING_VERIFICATION).forEach(rowEntry -> {
-                ResultNode entry = rowEntry.getEntry();
-                logger.info("Found document " + entry.getName() + " / " + entry.getId());
-                final var content = this.alfrescoRepository.getEntry(entry.getId());
-                final var contentHash = Hasher.hash(content, hashAlgorithm);
-                final var result = this.verifyTask.verifyHash(contentHash);
-                if (result.getRegistrationState() != BC_REGISTERED) {
-                    logger.info("Document " + entry.getName() + " / " + entry.getId() + " was not registered yet: " + result.getRegistrationState());
-                    return;
-                }
+            final List<ResultSetRowEntry> nodes = this.alfrescoRepository.selectAlfrescoNodes(ALF_PENDING_VERIFICATION);
+            logger.info("Found {} nodes", nodes.size());
+            nodes
+                    .forEach(rowEntry -> {
+                        final ResultNode entry = rowEntry.getEntry();
+                        logger.info("Found document " + entry.getName() + " / " + entry.getId());
+                        final var content = this.alfrescoRepository.getEntry(entry.getId());
+                        final var contentHash = Hasher.hash(content, hashAlgorithm);
+                        final var result = this.verifyTask.verifyHash(contentHash);
+                        if (result.getRegistrationState() != BC_REGISTERED) {
+                            logger.info("Document " + entry.getName() + " / " + entry.getId() + " was not registered yet: " + result.getRegistrationState());
+                            return;
+                        }
 
-                final var registrationState = AlfrescoBlockchainRegistrationState.from(result.getRegistrationState(), ALF_PENDING_VERIFICATION);
-                final var registrationTime = result.getRegistrationTime().orElse(null);
-                final var singleProofChainChainId = result.getChainId(VerifyBlockchainEntryChainType.SINGLE_CHAIN);
-                final var perHashProofChainChainId = result.getChainId(VerifyBlockchainEntryChainType.PER_HASH_CHAIN);
-                logger.info("Updating state to {} for document {} / {}", registrationState, entry.getName(), entry.getId());
-                this.alfrescoRepository.updateAlfrescoNodeWith(entry.getId(), registrationState, registrationTime, singleProofChainChainId, perHashProofChainChainId);
-            });
+                        final var registrationState = AlfrescoBlockchainRegistrationState.from(result.getRegistrationState(), ALF_PENDING_VERIFICATION);
+                        final var registrationTime = result.getRegistrationTime().orElse(null);
+                        final var singleProofChainChainId = result.getChainId(VerifyBlockchainEntryChainType.SINGLE_CHAIN);
+                        final var perHashProofChainChainId = result.getChainId(VerifyBlockchainEntryChainType.PER_HASH_CHAIN);
+                        logger.info("Updating state to {} for document {} / {}", registrationState, entry.getName(), entry.getId());
+                        this.alfrescoRepository.updateAlfrescoNodeWith(entry.getId(), registrationState, registrationTime, singleProofChainChainId, perHashProofChainChainId);
+                    });
         } catch (ApiException e) {
             logger.error("An error occurred whilst listing sites: " + e.getResponseBody(), e);
         } catch (Exception exception) {

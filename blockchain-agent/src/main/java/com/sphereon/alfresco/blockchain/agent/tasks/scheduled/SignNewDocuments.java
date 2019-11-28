@@ -30,7 +30,7 @@ public class SignNewDocuments {
         this.hashAlgorithm = hashAlgorithm;
     }
 
-    @Scheduled(fixedRate = EXECUTION_RATE, initialDelay = 60 * 1000)
+    @Scheduled(fixedRate = EXECUTION_RATE, initialDelay = 10 * 1000)
     public synchronized void execute() {
         try {
             logger.info("Searching for documents with registration state " + ALF_PENDING_REGISTRATION);
