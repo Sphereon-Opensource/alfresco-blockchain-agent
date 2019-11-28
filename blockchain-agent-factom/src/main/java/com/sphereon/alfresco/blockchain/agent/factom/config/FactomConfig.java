@@ -1,6 +1,9 @@
 package com.sphereon.alfresco.blockchain.agent.factom.config;
 
-import com.google.common.collect.ImmutableList;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sphereon.alfresco.blockchain.agent.factom.FactomClient;
 import com.sphereon.libs.blockchain.commons.Digest;
 import org.blockchain_innovation.factom.client.api.FactomdClient;
@@ -23,8 +26,6 @@ import org.springframework.context.annotation.Scope;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.BiConsumer;
-
-import static com.sphereon.alfresco.blockchain.agent.factom.config.ExternalIds.HASH_TYPE;
 
 @Configuration
 public class FactomConfig {
@@ -69,7 +70,8 @@ public class FactomConfig {
     public String factomChainId(final FactomClient factomClient,
                                 @Value("${sphereon.blockchain.agent.factom.chain.id:#{null}}") final String configuredChainId,
                                 @Value("${sphereon.blockchain.agent.factom.chain.names:#{T(java.util.Collections).emptyList()}}") final List<String> configuredChainNames,
-                                final Digest.Algorithm hashAlgorithm) {
+                                final ObjectMapper objectMapper,
+                                final Digest.Algorithm hashAlgorithm) throws JsonProcessingException {
         final boolean isChainIdConfigured = configuredChainId != null && !configuredChainId.isEmpty();
         final boolean isChainNamesConfigured = configuredChainNames != null && !configuredChainNames.isEmpty();
 
@@ -82,24 +84,18 @@ public class FactomConfig {
         }
 
         final var entry = new Entry();
-        entry.setContent("");
-        entry.setExternalIds(externalIdsFromNames(hashAlgorithm, configuredChainNames));
+        entry.setContent(contentFrom(hashAlgorithm, objectMapper));
+        entry.setExternalIds(configuredChainNames);
+
+        // TODO: Check whether chain already exists
+
         final var chainId = factomClient.createChainFromEntry(entry).getChainId();
         logger.info("Created chain " + chainId);
         return chainId;
     }
 
-    private List<String> externalIdsFromNames(final Digest.Algorithm hashAlgorithm, final List<String> configuredChainNames) {
-        final ImmutableList.Builder<String> externalIdsBuilder = ImmutableList.<String>builder()
-                .add(HASH_TYPE)
-                .add(hashAlgorithm.getImplementation());
-
-        configuredChainNames.forEach(chainName -> {
-            externalIdsBuilder.add(ExternalIds.CHAIN_NAME);
-            externalIdsBuilder.add(chainName);
-        });
-
-        return externalIdsBuilder.build();
+    private String contentFrom(final Digest.Algorithm hashAlgorithm, final ObjectMapper objectMapper) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(new FirstChainEntryContent(hashAlgorithm));
     }
 
     private RpcSettings factomDSettingsFrom(final String url,
@@ -136,5 +132,19 @@ public class FactomConfig {
         setProperty.accept("password", password);
 
         return new RpcSettingsImpl(subSystem, properties);
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private static class FirstChainEntryContent {
+        private final String hashAlgorithm;
+
+        private FirstChainEntryContent(final Digest.Algorithm hashAlgorithm) {
+            this.hashAlgorithm = hashAlgorithm.getImplementation();
+        }
+
+        @JsonProperty("hash_algorithm")
+        public String getHashAlgorithm() {
+            return hashAlgorithm;
+        }
     }
 }
