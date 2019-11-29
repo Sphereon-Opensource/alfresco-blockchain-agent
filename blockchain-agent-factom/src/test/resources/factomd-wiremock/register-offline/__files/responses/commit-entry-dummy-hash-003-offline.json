@@ -1,0 +1,9 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "message": "dummy-commit-message-return",
+    "txid": "dummy-tx-id-003",
+    "entryhash": "dummy-entry-hash"
+  }
+}

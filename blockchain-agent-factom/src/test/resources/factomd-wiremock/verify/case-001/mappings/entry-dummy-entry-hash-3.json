@@ -1,0 +1,35 @@
+{
+  "request": {
+    "urlPath": "/v2",
+    "method": "POST",
+    "headers": {
+      "Content-Type": {
+        "equalTo": "application/json"
+      }
+    },
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": {
+          "expression": "method",
+          "equalTo": "entry"
+        }
+      },
+      {
+        "matchesJsonPath": {
+          "expression": "params.hash",
+          "equalTo": "dummy-entry-hash-3"
+        }
+      },
+      {
+        "matchesJsonPath": {
+          "expression": "jsonrpc",
+          "equalTo": "2.0"
+        }
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "responses/entry-dummy-entry-hash-3-response.json"
+  }
+}

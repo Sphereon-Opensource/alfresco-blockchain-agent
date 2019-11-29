@@ -1,0 +1,29 @@
+{
+  "request": {
+    "urlPath": "/v2",
+    "method": "POST",
+    "headers": {
+      "Content-Type": {
+        "equalTo": "application/json"
+      }
+    },
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": {
+          "expression": "method",
+          "equalTo": "reveal-entry"
+        }
+      },
+      {
+        "matchesJsonPath": {
+          "expression": "jsonrpc",
+          "equalTo": "2.0"
+        }
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "responses/reveal-entry-dummy-hash-003-offline.json"
+  }
+}

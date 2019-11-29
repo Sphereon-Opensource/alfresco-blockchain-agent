@@ -1,0 +1,22 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "commit": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "params": {
+        "message": "dummy-hash-001-commit-message"
+      },
+      "method": "commit-entry"
+    },
+    "reveal": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "params": {
+        "entry": "dummy-hash-001-reveal-entry"
+      },
+      "method": "reveal-entry"
+    }
+  }
+}

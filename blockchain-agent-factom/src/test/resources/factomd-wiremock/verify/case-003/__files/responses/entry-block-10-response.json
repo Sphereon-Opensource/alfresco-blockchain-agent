@@ -1,0 +1,13 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "header": {
+      "blocksequencenumber": 1,
+      "chainid": "2fb913d6920590df41a11767266c9081ee930fa2e825a5b0fb0f2e98e30b5c58",
+      "prevkeymr": "0000000000000000000000000000000000000000000000000000000000000000",
+      "dbheight": 1234
+    },
+    "entrylist": []
+  }
+}

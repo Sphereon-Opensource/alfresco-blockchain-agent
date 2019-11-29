@@ -1,0 +1,35 @@
+{
+  "request": {
+    "urlPath": "/v2",
+    "method": "POST",
+    "headers": {
+      "Content-Type": {
+        "equalTo": "application/json"
+      }
+    },
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": {
+          "expression": "method",
+          "equalTo": "chain-head"
+        }
+      },
+      {
+        "matchesJsonPath": {
+          "expression": "params.chainid",
+          "equalTo": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "matchesJsonPath": {
+          "expression": "jsonrpc",
+          "equalTo": "2.0"
+        }
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "responses/chain-head-response.json"
+  }
+}

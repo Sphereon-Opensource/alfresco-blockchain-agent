@@ -1,0 +1,12 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "chainid": "fe07dab8c2917366f376b454736ac07865626074691b30ffddddda4ff02a9451",
+    "content": "// TODO: Signature",
+    "extids": [
+      "48617368",
+      "44756d6d792d686173682d303031"
+    ]
+  }
+}
