@@ -18,7 +18,7 @@ public class FactomVerifyTaskCase004Test {
     private FactomVerifyTask factomVerifyTask;
 
     @ClassRule
-    public static WireMockClassRule factomDWiremock = new WireMockClassRule(wireMockConfig()
+    public static WireMockClassRule factomdWiremock = new WireMockClassRule(wireMockConfig()
             .port(9088)
             .usingFilesUnderDirectory("src/test/resources/factomd-wiremock/verify"));
 

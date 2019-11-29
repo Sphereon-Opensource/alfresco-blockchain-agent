@@ -38,7 +38,7 @@ public class FactomConfig {
                                        @Value("${sphereon.blockchain.agent.factom.factomd.username:#{null}}") final String username,
                                        @Value("${sphereon.blockchain.agent.factom.factomd.password:#{null}}") final String password) {
         final var factomdClient = new FactomdClientImpl();
-        factomdClient.setSettings(factomDSettingsFrom(url, timeout, username, password));
+        factomdClient.setSettings(factomdSettingsFrom(url, timeout, username, password));
         return factomdClient;
     }
 
@@ -98,7 +98,7 @@ public class FactomConfig {
         return objectMapper.writeValueAsString(new FirstChainEntryContent(hashAlgorithm));
     }
 
-    private RpcSettings factomDSettingsFrom(final String url,
+    private RpcSettings factomdSettingsFrom(final String url,
                                             final String timeout,
                                             final String username,
                                             final String password) {

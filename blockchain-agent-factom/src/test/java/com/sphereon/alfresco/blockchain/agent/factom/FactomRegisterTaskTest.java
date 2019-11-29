@@ -18,7 +18,7 @@ public class FactomRegisterTaskTest {
     private FactomRegisterTask factomRegisterTask;
 
     @ClassRule
-    public static WireMockClassRule factomDWiremock = new WireMockClassRule(wireMockConfig()
+    public static WireMockClassRule factomdWiremock = new WireMockClassRule(wireMockConfig()
             .port(9088)
             .withRootDirectory("src/test/resources/factomd-wiremock/register")
             .usingFilesUnderDirectory("src/test/resources/factomd-wiremock/register"));
