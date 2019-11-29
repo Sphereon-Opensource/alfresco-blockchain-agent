@@ -2,7 +2,6 @@ package com.sphereon.alfresco.blockchain.agent.tasks.scheduled;
 
 import com.alfresco.apis.handler.ApiException;
 import com.alfresco.apis.model.ResultNode;
-import com.alfresco.apis.model.ResultSetRowEntry;
 import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
 import com.sphereon.alfresco.blockchain.agent.rest.model.VerifyBlockchainEntryChainType;
 import com.sphereon.alfresco.blockchain.agent.tasks.AlfrescoRepository;
@@ -13,14 +12,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 import static com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState.ALF_PENDING_VERIFICATION;
 import static com.sphereon.alfresco.blockchain.agent.model.BlockchainRegistrationState.BC_REGISTERED;
 
 @Component
 public class VerifyPendingRegistrations {
-    private static final int EXECUTION_RATE = 300000;
+    private static final int EXECUTION_RATE = 300_000;
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(VerifyPendingRegistrations.class);
 
@@ -40,9 +37,7 @@ public class VerifyPendingRegistrations {
     public synchronized void execute() {
         try {
             logger.info("Searching for documents with registration state " + ALF_PENDING_VERIFICATION);
-            final List<ResultSetRowEntry> nodes = this.alfrescoRepository.selectAlfrescoNodes(ALF_PENDING_VERIFICATION);
-            logger.info("Found {} nodes", nodes.size());
-            nodes
+            this.alfrescoRepository.selectAlfrescoNodes(ALF_PENDING_VERIFICATION)
                     .forEach(rowEntry -> {
                         final ResultNode entry = rowEntry.getEntry();
                         logger.info("Found document " + entry.getName() + " / " + entry.getId());

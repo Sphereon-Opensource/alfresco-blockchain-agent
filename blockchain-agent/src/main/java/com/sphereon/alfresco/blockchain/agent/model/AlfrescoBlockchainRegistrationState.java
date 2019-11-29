@@ -1,10 +1,11 @@
 package com.sphereon.alfresco.blockchain.agent.model;
 
 public enum AlfrescoBlockchainRegistrationState {
-    ALF_REGISTERED("REGISTERED"),
+    ALF_NOT_REGISTERED("NOT_REGISTERED"),
     ALF_PENDING_REGISTRATION("PENDING_REGISTRATION"),
+    ALF_REGISTERED("REGISTERED"),
     ALF_PENDING_VERIFICATION("PENDING_VERIFICATION"),
-    ALF_NOT_REGISTERED("NOT_REGISTERED");
+    ALF_VERIFICATION_FAILED("VERIFICATION_FAILED");
 
     private final String key;
 

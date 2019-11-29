@@ -14,7 +14,7 @@ import static com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainReg
 
 @Component
 public class SignNewDocuments {
-    private static final int EXECUTION_RATE = 30000;
+    private static final int EXECUTION_RATE = 30_000;
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SignNewDocuments.class);
 
