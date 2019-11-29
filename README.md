@@ -1,6 +1,14 @@
 # Sphereon Alfresco Blockchain Agent
 
-// TODO: Shortly describe functionality of Sphereon blockchain integration. Then explain role of agent in this.
+The Sphereon Alfresco Blockchain integration enables Alfresco users to register proof-of-existence of files on Blockchain. Because by nature, Blockchains are immutable this proof-of-existence cannot be tampered with and is therefore a reliable way to proof that files within Alfresco have existed at least since the date and time of registration.
+
+This repository contains the blockchain agent, a back-end service that can be run within or outside of an Alfresco Cluster which will bridge the gap between files within Alfresco and the Blockchain. It contains functionality to register the hashes of files onto the blockchain, and verify that a certain hash was written to the blockchain in the past.
+
+## Modules
+
+There are two flavors: The `blockchain-agent-sphereon-proof` uses the Sphereon Proof API, which is an easy way to get started with this agent. The Proof API will do the heavy lifting with regards to blockchain communication, which means it only requires an API key-secret pair for authenticating with Sphereon's API gateway. For users who want to run their own Factom daemon and optionally a Wallet daemon there is the `blockchain-agent-factom`. This variant will connect to a Factom daemon to write entries to the Factom Blockchain, which is a more direct approach but requires setup of an additional daemon.
+
+Whichever is best for you, the specifics of configuring either is specified in their own README. Common configuration, such as the Alfresco connection, is specified in this README.
 
 ## Alfresco
 
@@ -17,6 +25,10 @@ The Alfresco connection of this agent was tested by running a cluster started us
 
 More information on this can be found at [docs.alfresco.com](https://docs.alfresco.com/6.1/concepts/acs-deploy-architecture.html)
 
+### Alfresco Configuration
+
+TODO
+
 ## Blockchain integration
 
 Add the following configuration to be able to sign entries before they are posted to blockchain:
@@ -26,29 +38,3 @@ sphereon.blockchain.agent.cert-path=/opt/sphereon/alfresco/cert/Alfresco-Blockch
 sphereon.blockchain.agent.cert-password=dummy-password
 sphereon.blockchain.agent.cert-alias=blockchain
 ```
-
-### Connection to blockchain
-
-The Sphereon Alfresco blockchain integration can work with either a direct Factom connection (option 1) or the Sphereon Blockchain Proof API (option 2).
-The difference is that in the later case, the Blockchain Proof API does the heavy lifting regarding blockchain interaction. Using a direct Factom connection requires a `factomd` node connected to the Factom blockchain network and an entrycredits address to fund posting entries to the blockchain.
-
-#### Option 1: Factom connection
-
-// TODO: Describe configuration needed
-
-#### Option 2: Sphereon Blockchain Proof API connection
-
-To use the Sphereon Blockchain Proof API, configure the following properties:
-```
-BLOCKCHAIN_CONSUMER_KEY=uTqiAhah_lcYM3VZdNg34yrzvqsa
-BLOCKCHAIN_CONSUMER_SECRET=y8NxjeMMEb8fNN_heZK7f1lEqaEa
-sphereon.store.application-name
-sphereon.blockchain.agent.blockchain-proof.config-name=alfresco-blockchain-factom
-sphereon.blockchain.agent.blockchain-proof.context=factom
-```
-
-The consumer key and secret can be obtained from [store.sphereon.com](https://store.sphereon.com).
-Register an account and use it to sign in. Then, create an application. This application will correspond to the blockchain-agent deployment within or outside of the Alfresco cluster.
-The application should subscribe to the Blockchain Proof and Easy Blockchain APIs in the store. Generate the consumer key and secret from the application detail page under the tab "Production Keys".
-
-The `config-name` and `context` have functional defaults as shown above, but they can be overriden by a custom configuration. See the Blockchain Proof API documentation (found at store.sphereon.com) for more information on configurations.
