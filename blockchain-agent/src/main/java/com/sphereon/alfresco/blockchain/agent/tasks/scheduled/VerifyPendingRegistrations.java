@@ -57,9 +57,9 @@ public class VerifyPendingRegistrations {
                         this.alfrescoRepository.updateAlfrescoNodeWith(entry.getId(), registrationState, registrationTime, singleProofChainChainId, perHashProofChainChainId);
                     });
         } catch (ApiException e) {
-            logger.error("An error occurred whilst listing sites: " + e.getResponseBody(), e);
+            logger.error("An error occurred whilst communicating with Alfresco: " + e.getResponseBody(), e);
         } catch (Exception exception) {
-            logger.error("An error occurred whilst listing sites", exception);
+            logger.error("An error occurred whilst listing sites: " + exception.getMessage(), exception);
         }
     }
 }

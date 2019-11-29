@@ -6,13 +6,7 @@ import com.alfresco.apis.handler.ApiClient;
 import com.alfresco.apis.handler.ApiException;
 import com.alfresco.apis.handler.Pair;
 import com.alfresco.apis.handler.auth.HttpBasicAuth;
-import com.alfresco.apis.model.NodeBodyUpdate;
-import com.alfresco.apis.model.NodeEntry;
-import com.alfresco.apis.model.RequestInclude;
-import com.alfresco.apis.model.RequestQuery;
-import com.alfresco.apis.model.ResultSetPaging;
-import com.alfresco.apis.model.ResultSetRowEntry;
-import com.alfresco.apis.model.SearchRequest;
+import com.alfresco.apis.model.*;
 import com.google.common.collect.ImmutableMap;
 import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
 import org.slf4j.LoggerFactory;
@@ -155,7 +149,7 @@ public class AlfrescoRepository {
 
             logger.info("Node " + alfrescoNodeId + " updated");
         } catch (Exception exception) {
-            throw new RuntimeException("An error occurred whilst updating state in node " + alfrescoNodeId, exception);
+            throw new RuntimeException("An error occurred whilst updating state in node " + alfrescoNodeId + ": " + exception.getMessage(), exception);
         }
     }
 

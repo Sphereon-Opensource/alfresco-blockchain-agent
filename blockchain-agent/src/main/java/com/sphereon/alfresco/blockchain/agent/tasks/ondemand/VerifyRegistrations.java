@@ -84,7 +84,7 @@ public class VerifyRegistrations {
                         }
                     });
         } catch (Exception exception) {
-            logger.error("An error occurred whilst executing VerifyRegistrationsTask", exception);
+            logger.error("An error occurred whilst executing VerifyRegistrationsTask: " + exception.getMessage(), exception);
         }
 
         return contentResponses;
