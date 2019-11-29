@@ -145,6 +145,11 @@ public class FactomClient {
     }
 
     private CompletableFuture<ComposeResponse> composeChain(final Chain chain) {
+        if (this.walletdClient instanceof OfflineWalletdClientImpl) {
+            return this.walletdClient.composeChain(chain, this.entryCreditsAddress)
+                    .thenApply(FactomResponse::getResult);
+        }
+
         return this.walletdClient.composeChain(chain, this.entryCreditsAddress)
                 .thenApply(this::validateFactomResponse);
     }
