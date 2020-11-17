@@ -6,7 +6,13 @@ import com.alfresco.apis.handler.ApiClient;
 import com.alfresco.apis.handler.ApiException;
 import com.alfresco.apis.handler.Pair;
 import com.alfresco.apis.handler.auth.HttpBasicAuth;
-import com.alfresco.apis.model.*;
+import com.alfresco.apis.model.NodeBodyUpdate;
+import com.alfresco.apis.model.NodeEntry;
+import com.alfresco.apis.model.RequestInclude;
+import com.alfresco.apis.model.RequestQuery;
+import com.alfresco.apis.model.ResultSetPaging;
+import com.alfresco.apis.model.ResultSetRowEntry;
+import com.alfresco.apis.model.SearchRequest;
 import com.google.common.collect.ImmutableMap;
 import com.sphereon.alfresco.blockchain.agent.model.AlfrescoBlockchainRegistrationState;
 import org.slf4j.LoggerFactory;
@@ -40,17 +46,20 @@ public class AlfrescoRepository {
 
     private String model;
     private String registrationStateProperty;
+    private String explorerChainLinkTemplate;
 
     public AlfrescoRepository(final SearchApi alfrescoSearchApi,
                               final ApiClient cmisApiClient,
                               final NodesApi alfrescoNodesApi,
                               @Value("${sphereon.blockchain.agent.alfresco.query.model}") final String model,
-                              @Value("${sphereon.blockchain.agent.alfresco.query.registration-state:RegistrationState}") final String registrationStateProperty) {
+                              @Value("${sphereon.blockchain.agent.alfresco.query.registration-state:RegistrationState}") final String registrationStateProperty,
+                              @Value("${app.blockchain.explorer.chainLinkTemplate}") final String explorerChainLinkTemplate) {
         this.alfrescoSearchApi = alfrescoSearchApi;
         this.cmisApiClient = cmisApiClient;
         this.alfrescoNodesApi = alfrescoNodesApi;
         this.model = model;
         this.registrationStateProperty = registrationStateProperty;
+        this.explorerChainLinkTemplate = explorerChainLinkTemplate;
     }
 
     public List<ResultSetRowEntry> selectAlfrescoNodes(final AlfrescoBlockchainRegistrationState state) throws ApiException {
@@ -133,8 +142,7 @@ public class AlfrescoRepository {
     }
 
     private String explorerLinkFrom(final String chainId) {
-        // TODO: Make configurable
-        return "https://explorer.factoid.org/data?type=chain&key=" + chainId;
+        return String.format(this.explorerChainLinkTemplate, chainId);
     }
 
     private void updateAlfrescoNodeWith(final String alfrescoNodeId, final Map<String, String> properties) {
