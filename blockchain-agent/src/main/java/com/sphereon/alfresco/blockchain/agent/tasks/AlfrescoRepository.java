@@ -53,7 +53,7 @@ public class AlfrescoRepository {
                               final NodesApi alfrescoNodesApi,
                               @Value("${sphereon.blockchain.agent.alfresco.query.model}") final String model,
                               @Value("${sphereon.blockchain.agent.alfresco.query.registration-state:RegistrationState}") final String registrationStateProperty,
-                              @Value("${app.blockchain.explorer.chainLinkTemplate}") final String explorerLinkTemplate) {
+                              @Value("${app.blockchain.explorer.chainLinkTemplate}") final String explorerChainLinkTemplate) {
         this.alfrescoSearchApi = alfrescoSearchApi;
         this.cmisApiClient = cmisApiClient;
         this.alfrescoNodesApi = alfrescoNodesApi;
